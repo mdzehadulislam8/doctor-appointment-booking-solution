@@ -1,0 +1,113 @@
+{% extends 'base.html' %}
+
+{% block title %}Find Doctors by Specialty - DrSeba.com{% endblock %}
+
+{% block content %}
+<!-- Page Header -->
+<div class="bg-light py-4 mb-5">
+    <div class="container">
+        <a href="/" class="text-decoration-none text-muted small">← Back to Home</a>
+        <h1 class="display-5 fw-bold mt-3">Select Specialty Category</h1>
+        <p class="lead text-muted">Choose a specialty to find the best doctors for your specific health needs</p>
+    </div>
+</div>
+
+<!-- Specialties Grid -->
+<section class="py-5">
+    <div class="container">
+        <div class="row g-4">
+            {% for specialty in specialties %}
+            <div class="col-lg-3 col-md-4 col-6">
+                <a href="{% url 'doctors:by_specialty' specialty.name|lower|slugify %}" class="text-decoration-none">
+                    <div class="specialty-category-card">
+                        <!-- Emoji Icon -->
+                        <div class="specialty-emoji">
+                            {{ specialty.emoji|default:"⚕️" }}
+                        </div>
+                        
+                        <!-- Specialty Name -->
+                        <h5 class="fw-bold text-dark mt-3 mb-2">{{ specialty.name }}</h5>
+                        
+                        <!-- Description -->
+                        <p class="text-muted small mb-0">{{ specialty.description|default:"Specialists in this field" }}</p>
+                    </div>
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- CTA Section -->
+<section class="py-5 bg-primary text-white text-center">
+    <div class="container">
+        <h2 class="fw-bold mb-3">Can't find what you're looking for?</h2>
+        <p class="lead mb-4">Try searching by doctor name or use our advanced filters</p>
+        <a href="/doctors/" class="btn btn-light btn-lg">
+            <i class="bi bi-search me-2"></i>Search All Doctors
+        </a>
+    </div>
+</section>
+
+<style>
+    .specialty-category-card {
+        padding: 30px 20px;
+        border-radius: 12px;
+        background: white;
+        border: 1px solid #e9ecef;
+        text-align: center;
+        transition: all 0.3s ease;
+        cursor: pointer;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .specialty-category-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 12px 32px rgba(10, 116, 218, 0.15);
+        border-color: #0A74DA;
+    }
+
+    .specialty-emoji {
+        font-size: 4rem;
+        line-height: 1;
+        transition: all 0.3s ease;
+    }
+
+    .specialty-category-card:hover .specialty-emoji {
+        transform: scale(1.1) rotateZ(5deg);
+    }
+
+    .specialty-category-card h5 {
+        color: #1a1a1a;
+        font-size: 1.05rem;
+        transition: all 0.3s ease;
+    }
+
+    .specialty-category-card:hover h5 {
+        color: #0A74DA;
+    }
+
+    .bg-light {
+        background: linear-gradient(135deg, #f5f7fa 0%, #e9ecef 100%);
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+        .specialty-category-card {
+            padding: 20px 15px;
+        }
+
+        .specialty-emoji {
+            font-size: 3rem;
+        }
+
+        .specialty-category-card h5 {
+            font-size: 0.95rem;
+        }
+    }
+</style>
+{% endblock %}

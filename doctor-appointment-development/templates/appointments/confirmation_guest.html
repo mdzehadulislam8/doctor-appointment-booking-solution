@@ -1,0 +1,115 @@
+{% extends 'base.html' %}
+
+{% block title %}Appointment Confirmed - DrSeba.com{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <!-- Back Button -->
+    <a href="/" class="btn btn-link text-primary mb-3">
+        <i class="bi bi-chevron-left me-2"></i>Back
+    </a>
+
+    <div class="row">
+        <div class="col-lg-8 offset-lg-2">
+            <!-- Step Indicator - All Completed -->
+            <div class="d-flex justify-content-between align-items-center mb-5" style="font-size: 0.85rem;">
+                <div class="text-center flex-grow-1" style="flex: 0.8;">
+                    <div class="badge rounded-circle bg-success" style="width: 35px; height: 35px; line-height: 35px; font-size: 0.9rem;">✓</div>
+                    <small class="d-block mt-2" style="font-size: 0.75rem;">Select</small>
+                    <small class="d-block" style="font-size: 0.75rem;">Appointments</small>
+                </div>
+                <div class="flex-grow-1 border-top border-2 border-success" style="margin: 0 5px;"></div>
+                
+                <div class="text-center flex-grow-1" style="flex: 0.8;">
+                    <div class="badge rounded-circle bg-success" style="width: 35px; height: 35px; line-height: 35px; font-size: 0.9rem;">✓</div>
+                    <small class="d-block mt-2" style="font-size: 0.75rem;">Patient</small>
+                    <small class="d-block" style="font-size: 0.75rem;">Info</small>
+                </div>
+                <div class="flex-grow-1 border-top border-2 border-success" style="margin: 0 5px;"></div>
+                
+                <div class="text-center flex-grow-1" style="flex: 0.8;">
+                    <div class="badge rounded-circle bg-success" style="width: 35px; height: 35px; line-height: 35px; font-size: 0.9rem;">✓</div>
+                    <small class="d-block mt-2" style="font-size: 0.75rem;">Payment</small>
+                </div>
+                <div class="flex-grow-1 border-top border-2 border-success" style="margin: 0 5px;"></div>
+                
+                <div class="text-center flex-grow-1" style="flex: 0.8;">
+                    <div class="badge rounded-circle bg-success" style="width: 35px; height: 35px; line-height: 35px; font-size: 0.9rem;">✓</div>
+                    <small class="d-block mt-2" style="font-size: 0.75rem;">Login/Guest</small>
+                </div>
+                <div class="flex-grow-1 border-top border-2 border-success" style="margin: 0 5px;"></div>
+                
+                <div class="text-center flex-grow-1" style="flex: 0.8;">
+                    <div class="badge rounded-circle bg-success" style="width: 35px; height: 35px; line-height: 35px; font-size: 0.9rem;">✓</div>
+                    <small class="d-block mt-2 fw-bold" style="font-size: 0.75rem;">Confirm</small>
+                </div>
+            </div>
+
+            <!-- Confirmation Message -->
+            <div class="text-center mb-5">
+                <div style="font-size: 4rem; color: #27ae60; margin-bottom: 1rem;">✓</div>
+                <h2 class="fw-bold mb-3">Booking Confirmed!</h2>
+                <p class="text-muted" style="font-size: 1.1rem;">Your appointments have been successfully booked. You will receive confirmations via SMS and email.</p>
+            </div>
+
+            <!-- Confirmation Details -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body p-4">
+                    <div class="row mb-4">
+                        <div class="col-6">
+                            <small class="text-muted d-block mb-1">Booking ID</small>
+                            <h6 class="fw-bold">BK21552</h6>
+                        </div>
+                        <div class="col-6 text-end">
+                            <small class="text-muted d-block mb-1">Doctor</small>
+                            <h6 class="fw-bold">{% if guest_appointment %}{{ guest_appointment.doctor_name }}{% else %}Dr. Name{% endif %}</h6>
+                        </div>
+                    </div>
+
+                    <hr>
+
+                    <div class="row mb-4">
+                        <div class="col-6">
+                            <small class="text-muted d-block mb-1">Patient Name</small>
+                            <h6 class="fw-bold">{% if guest_appointment %}{{ guest_appointment.full_name }}{% endif %}</h6>
+                        </div>
+                        <div class="col-6 text-end">
+                            <small class="text-muted d-block mb-1">Email</small>
+                            <h6 class="fw-bold text-truncate">{% if guest_appointment %}{{ guest_appointment.email }}{% endif %}</h6>
+                        </div>
+                    </div>
+
+                    <hr>
+
+                    <div class="row">
+                        <div class="col-6">
+                            <small class="text-muted d-block mb-1">Total Appointments</small>
+                            <h6 class="fw-bold">1</h6>
+                        </div>
+                        <div class="col-6 text-end">
+                            <small class="text-muted d-block mb-1">Amount Paid</small>
+                            <h6 class="fw-bold">৳50</h6>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Info Box -->
+            <div class="alert alert-info mb-4">
+                <i class="bi bi-info-circle me-2"></i>
+                <strong>Confirmation Details:</strong> You will receive booking confirmation via SMS and email at <strong class="d-block mt-2">{% if guest_appointment %}{{ guest_appointment.email }} and {{ guest_appointment.phone }}{% endif %}</strong>
+            </div>
+
+            <!-- Actions -->
+            <div class="d-grid gap-2">
+                <a href="/" class="btn btn-primary btn-lg">
+                    <i class="bi bi-house me-2"></i>Go Home
+                </a>
+                <a href="/find-doctors/" class="btn btn-outline-secondary btn-lg">
+                    <i class="bi bi-search me-2"></i>Find More Doctors
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

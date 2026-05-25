@@ -1,0 +1,631 @@
+{% extends 'base.html' %}
+
+{% block title %}Book Appointment - {{ doctor.user.get_full_name }} - DrSeba.com{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <!-- Back Button -->
+    <a href="{% url 'doctors:detail' doctor.id %}" class="btn-link mb-3" style="color: var(--primary-blue); display: inline-flex; align-items: center; gap: 0.5rem;">
+        <i class="bi bi-chevron-left"></i>Back to Profile
+    </a>
+
+    <div class="row">
+        <!-- Main Content -->
+        <div class="col-lg-8">
+            <!-- Progress Indicator -->
+            <div class="progress-indicator">
+                <!-- Step 1 -->
+                <div class="progress-step">
+                    <div class="progress-step-number {% if step == '1' %}active{% elif step > '1' %}completed{% else %}pending{% endif %}">
+                        {% if step > '1' %}<i class="bi bi-check" style="font-size: 1.2rem;"></i>{% else %}1{% endif %}
+                    </div>
+                    <div class="progress-step-label {% if step == '1' %}active{% elif step > '1' %}completed{% endif %}">
+                        Select<br>Appointment
+                    </div>
+                </div>
+
+                <!-- Connector 1-2 -->
+                <div class="progress-connector {% if step > '1' %}completed{% elif step == '2' %}active{% endif %}" style="left: 12%; right: 12%;"></div>
+
+                <!-- Step 2 -->
+                <div class="progress-step">
+                    <div class="progress-step-number {% if step == '2' %}active{% elif step > '2' %}completed{% else %}pending{% endif %}">
+                        {% if step > '2' %}<i class="bi bi-check" style="font-size: 1.2rem;"></i>{% else %}2{% endif %}
+                    </div>
+                    <div class="progress-step-label {% if step == '2' %}active{% elif step > '2' %}completed{% endif %}">
+                        Patient<br>Info
+                    </div>
+                </div>
+
+                <!-- Connector 2-3 -->
+                <div class="progress-connector {% if step > '2' %}completed{% elif step == '3' %}active{% endif %}" style="left: 12%; right: 12%;"></div>
+
+                <!-- Step 3 -->
+                <div class="progress-step">
+                    <div class="progress-step-number {% if step == '3' %}active{% elif step > '3' %}completed{% else %}pending{% endif %}">
+                        {% if step > '3' %}<i class="bi bi-check" style="font-size: 1.2rem;"></i>{% else %}3{% endif %}
+                    </div>
+                    <div class="progress-step-label {% if step == '3' %}active{% elif step > '3' %}completed{% endif %}">
+                        Payment<br>Method
+                    </div>
+                </div>
+
+                <!-- Connector 3-4 -->
+                <div class="progress-connector {% if step > '3' %}completed{% elif step == '4' %}active{% endif %}" style="left: 12%; right: 12%;"></div>
+
+                <!-- Step 4 -->
+                <div class="progress-step">
+                    <div class="progress-step-number {% if step == '4' %}active{% elif step > '4' %}completed{% else %}pending{% endif %}">
+                        {% if step > '4' %}<i class="bi bi-check" style="font-size: 1.2rem;"></i>{% else %}4{% endif %}
+                    </div>
+                    <div class="progress-step-label {% if step == '4' %}active{% elif step > '4' %}completed{% endif %}">
+                        Account<br>Choice
+                    </div>
+                </div>
+
+                <!-- Connector 4-5 -->
+                <div class="progress-connector {% if step > '4' %}completed{% elif step == '5' %}active{% endif %}" style="left: 12%; right: 12%;"></div>
+
+                <!-- Step 5 -->
+                <div class="progress-step">
+                    <div class="progress-step-number {% if step == '5' %}active{% elif step > '5' %}completed{% else %}pending{% endif %}">
+                        {% if step > '5' %}<i class="bi bi-check" style="font-size: 1.2rem;"></i>{% else %}5{% endif %}
+                    </div>
+                    <div class="progress-step-label {% if step == '5' %}active{% elif step > '5' %}completed{% endif %}">
+                        Confirm<br>Booking
+                    </div>
+                </div>
+            </div>
+
+            {% if step == '1' %}
+            <!-- Step 1: Select Appointment -->
+            {% if messages %}
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                {% for message in messages %}
+                    {{ message }}
+                {% endfor %}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+            {% endif %}
+            
+            <h3 class="mb-4">Select Your Preferred Appointment</h3>
+
+            <form method="POST">
+                {% csrf_token %}
+                <input type="hidden" name="step" value="1">
+
+                <!-- Consultation Type Selection -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">Consultation Type</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="toggle-group">
+                            <button type="button" class="toggle-btn active consultation-type-btn" data-value="in_person">
+                                <i class="bi bi-geo-alt me-2"></i>In-Person
+                            </button>
+                            <button type="button" class="toggle-btn consultation-type-btn" data-value="online">
+                                <i class="bi bi-camera-video me-2"></i>Online
+                            </button>
+                        </div>
+                        <input type="hidden" name="consultation_type" id="consultation_type" value="in_person" required>
+                    </div>
+                </div>
+
+                <!-- Hospital/Chamber Selection -->
+                {% if hospitals %}
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">Select Hospital/Chamber</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="hospital-cards">
+                            {% for hospital in hospitals %}
+                            <div class="hospital-card card-selectable" data-hospital-id="{{ hospital.id }}">
+                                <div class="hospital-name">{{ hospital.name }}</div>
+                                <div class="hospital-location">
+                                    <i class="bi bi-geo-alt"></i>
+                                    <span>{{ hospital.address }}</span>
+                                </div>
+                                <div class="hospital-distance">
+                                    <i class="bi bi-clock"></i> Sun-Thu, 5:00 PM - 8:00 PM
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        <input type="hidden" name="hospital_id" id="hospital_id" value="{{ hospitals.0.id }}" required>
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- Date Selection -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">Select Date</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="date-pills" id="dateSelection">
+                            {% regroup availabilities by date as availabilities_by_date %}
+                            {% for date_group in availabilities_by_date %}
+                                <button type="button" class="date-pill date-btn" data-date="{{ date_group.grouper|date:'Y-m-d' }}">
+                                    <div style="font-size: 1.1rem; font-weight: 700;">{{ date_group.grouper|date:"d" }}</div>
+                                    <small>{{ date_group.grouper|date:"M d" }}</small>
+                                </button>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Time Selection -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">Select Time</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="date-pills" id="timeSelection">
+                            <!-- Populated by JavaScript -->
+                        </div>
+                        <input type="hidden" name="availability_id" id="availability_id" required>
+                    </div>
+                </div>
+
+                <!-- Actions -->
+                <div class="d-grid gap-2">
+                    <button type="submit" class="btn btn-primary btn-lg">
+                        <i class="bi bi-arrow-right me-2"></i>Continue
+                    </button>
+                </div>
+            </form>
+
+            <script>
+            const availabilitiesData = {{ availabilities_json|safe }};
+            let selectedDate = null;
+            
+            // ===== CONSULTATION TYPE SELECTION =====
+            const consultationBtns = document.querySelectorAll('.consultation-type-btn');
+            consultationBtns.forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    consultationBtns.forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    document.getElementById('consultation_type').value = this.getAttribute('data-value');
+                });
+            });
+            
+            // ===== HOSPITAL SELECTION =====
+            const hospitalCards = document.querySelectorAll('.hospital-card');
+            hospitalCards.forEach(card => {
+                card.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    hospitalCards.forEach(c => c.classList.remove('selected'));
+                    this.classList.add('selected');
+                    document.getElementById('hospital_id').value = this.getAttribute('data-hospital-id');
+                });
+            });
+            
+            if (hospitalCards.length > 0) {
+                hospitalCards[0].classList.add('selected');
+            }
+            
+            // ===== DATE SELECTION =====
+            const dateButtons = document.querySelectorAll('.date-btn');
+            dateButtons.forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    dateButtons.forEach(b => b.classList.remove('selected'));
+                    this.classList.add('selected');
+                    selectedDate = this.getAttribute('data-date');
+                    
+                    const timesForDate = availabilitiesData.filter(av => av.date === selectedDate);
+                    const timeSelection = document.getElementById('timeSelection');
+                    
+                    if (timesForDate.length === 0) {
+                        timeSelection.innerHTML = '<p class="text-muted">No available slots for this date</p>';
+                        return;
+                    }
+                    
+                    let timeHtml = '';
+                    timesForDate.forEach(av => {
+                        timeHtml += `
+                            <button type="button" class="date-pill time-btn" data-availability-id="${av.id}">
+                                ${av.time_slot}
+                            </button>
+                        `;
+                    });
+                    
+                    timeSelection.innerHTML = timeHtml;
+                    document.querySelectorAll('.time-btn').forEach(btn => {
+                        btn.addEventListener('click', function(e) {
+                            e.preventDefault();
+                            document.querySelectorAll('.time-btn').forEach(b => b.classList.remove('selected'));
+                            this.classList.add('selected');
+                            document.getElementById('availability_id').value = this.getAttribute('data-availability-id');
+                        });
+                    });
+                });
+            });
+            </script>
+
+            {% elif step == '2' %}
+            <!-- Step 2: Patient Information -->
+            <h3 class="mb-4">Patient Information</h3>
+
+            <form method="POST">
+                {% csrf_token %}
+                <input type="hidden" name="step" value="2">
+
+                <div class="card">
+                    <div class="card-body">
+                        <!-- Full Name -->
+                        <div class="mb-3">
+                            <label class="form-label">Full Name <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-person"></i></span>
+                                <input type="text" name="full_name" class="form-control" placeholder="Your name" value="{% if user.is_authenticated %}{{ user.get_full_name }}{% elif user_full_name %}{{ user_full_name }}{% endif %}" required>
+                            </div>
+                        </div>
+
+                        <!-- Age -->
+                        <div class="mb-3">
+                            <label class="form-label">Age <span class="text-danger">*</span></label>
+                            <input type="number" name="age" class="form-control" placeholder="22" min="1" max="120" required>
+                        </div>
+
+                        <!-- Gender -->
+                        <div class="mb-3">
+                            <label class="form-label">Gender <span class="text-danger">*</span></label>
+                            <select name="gender" class="form-select" required>
+                                <option value="">Select Gender</option>
+                                <option value="male">Male</option>
+                                <option value="female">Female</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+
+                        <!-- Phone -->
+                        <div class="mb-3">
+                            <label class="form-label">Phone Number <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-telephone"></i></span>
+                                <input type="tel" name="phone" class="form-control" placeholder="01700123456" value="{{ request.user.phone }}" required>
+                            </div>
+                        </div>
+
+                        <!-- Email -->
+                        <div class="mb-3">
+                            <label class="form-label">Email <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-envelope"></i></span>
+                                <input type="email" name="email" class="form-control" placeholder="patient@example.com" value="{{ request.user.email }}" required>
+                            </div>
+                        </div>
+
+                        <!-- Symptoms/Reason -->
+                        <div class="mb-3">
+                            <label class="form-label">Symptoms / Reason for Visit</label>
+                            <textarea name="symptoms" class="form-control" rows="4" placeholder="Briefly describe your symptoms or reason for visit..."></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Actions -->
+                <div class="d-grid gap-2 mt-4">
+                    <button type="submit" class="btn btn-primary btn-lg">
+                        <i class="bi bi-arrow-right me-2"></i>Continue to Payment
+                    </button>
+                </div>
+            </form>
+
+            {% elif step == '3' %}
+            <!-- Step 3: Payment Method -->
+            <h3 class="mb-4">Select Payment Method</h3>
+
+            <div class="alert alert-info mb-4">
+                <i class="bi bi-info-circle me-2"></i>
+                <strong>Booking Summary:</strong> You are booking 1 appointment with a service charge of <strong>৳50</strong>. Consultation fees will be paid at the hospital.
+            </div>
+
+            <form method="POST">
+                {% csrf_token %}
+                <input type="hidden" name="step" value="3">
+
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">Payment Method</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <!-- bKash -->
+                            <div class="col-md-6">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="payment_method" id="bkash" value="bKash" required>
+                                    <label class="form-check-label w-100" for="bkash">
+                                        <div class="payment-card card-selectable p-4 text-center">
+                                            <i class="bi bi-credit-card fs-2 text-primary mb-2"></i>
+                                            <h6 class="fw-bold">bKash</h6>
+                                            <small class="text-muted">Mobile Money</small>
+                                        </div>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <!-- Nagad -->
+                            <div class="col-md-6">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="payment_method" id="nagad" value="Nagad">
+                                    <label class="form-check-label w-100" for="nagad">
+                                        <div class="payment-card card-selectable p-4 text-center" style="border-color: #9b59b6; background-color: rgba(155, 89, 182, 0.05);">
+                                            <i class="bi bi-credit-card fs-2 mb-2" style="color: #9b59b6;"></i>
+                                            <h6 class="fw-bold">Nagad</h6>
+                                            <small class="text-muted">Mobile Money</small>
+                                        </div>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <!-- Card -->
+                            <div class="col-md-6">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="payment_method" id="card" value="Card">
+                                    <label class="form-check-label w-100" for="card">
+                                        <div class="payment-card card-selectable p-4 text-center" style="border-color: #3498db; background-color: rgba(52, 152, 219, 0.05);">
+                                            <i class="bi bi-credit-card fs-2 mb-2" style="color: #3498db;"></i>
+                                            <h6 class="fw-bold">Credit/Debit Card</h6>
+                                            <small class="text-muted">Visa, Mastercard</small>
+                                        </div>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <!-- Cash on Visit -->
+                            <div class="col-md-6">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="payment_method" id="cash" value="Cash">
+                                    <label class="form-check-label w-100" for="cash">
+                                        <div class="payment-card card-selectable p-4 text-center" style="border-color: #27ae60; background-color: rgba(39, 174, 96, 0.05);">
+                                            <i class="bi bi-cash-coin fs-2 mb-2" style="color: #27ae60;"></i>
+                                            <h6 class="fw-bold">Cash on Visit</h6>
+                                            <small class="text-muted">Pay at hospital</small>
+                                        </div>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="alert alert-warning">
+                    <i class="bi bi-exclamation-triangle me-2"></i>
+                    You will receive payment instructions via SMS and email after confirming.
+                </div>
+
+                <!-- Actions -->
+                <div class="d-grid gap-2">
+                    <button type="submit" class="btn btn-primary btn-lg">
+                        <i class="bi bi-arrow-right me-2"></i>Confirm Booking
+                    </button>
+                </div>
+            </form>
+
+            {% elif step == '4' %}
+            <!-- Step 4: Login / Signup / Guest Choice -->
+            <h3 class="mb-4">Save Your Information</h3>
+
+            <p class="text-muted mb-4">Would you like to create an account to save your information for future bookings, or continue as a guest?</p>
+
+            <form method="POST">
+                {% csrf_token %}
+                <input type="hidden" name="step" value="4">
+
+                <div class="row g-3 mb-4">
+                    <!-- Sign Up Option -->
+                    <div class="col-md-4">
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="auth_choice" id="signup" value="signup" required>
+                            <label class="form-check-label w-100" for="signup">
+                                <div class="card h-100 card-selectable p-4 text-center">
+                                    <i class="bi bi-person-plus fs-2 text-primary mb-3"></i>
+                                    <h6 class="fw-bold">Create Account</h6>
+                                    <small class="text-muted d-block mt-2">Sign up for an account</small>
+                                    <small class="text-muted d-block">and save your info</small>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Login Option -->
+                    <div class="col-md-4">
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="auth_choice" id="login" value="login">
+                            <label class="form-check-label w-100" for="login">
+                                <div class="card h-100 card-selectable p-4 text-center">
+                                    <i class="bi bi-box-arrow-in-right fs-2 text-success mb-3"></i>
+                                    <h6 class="fw-bold">Sign In</h6>
+                                    <small class="text-muted d-block mt-2">Login to your</small>
+                                    <small class="text-muted d-block">existing account</small>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Guest Option -->
+                    <div class="col-md-4">
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="auth_choice" id="guest" value="guest">
+                            <label class="form-check-label w-100" for="guest">
+                                <div class="card h-100 card-selectable p-4 text-center">
+                                    <i class="bi bi-person fs-2 mb-3" style="color: #95a5a6;"></i>
+                                    <h6 class="fw-bold">Continue as Guest</h6>
+                                    <small class="text-muted d-block mt-2">Book without</small>
+                                    <small class="text-muted d-block">creating account</small>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Actions -->
+                <div class="d-grid gap-2">
+                    <button type="submit" class="btn btn-primary btn-lg">
+                        <i class="bi bi-arrow-right me-2"></i>Continue
+                    </button>
+                </div>
+            </form>
+
+            {% elif step == '5' %}
+            <!-- Step 5: Confirmation -->
+            <div class="text-center py-4">
+                <div class="mb-4" style="font-size: 4rem; color: var(--secondary-green);">
+                    <i class="bi bi-check-circle-fill"></i>
+                </div>
+                <h2 class="fw-bold mb-2">Booking Confirmed!</h2>
+                <p class="text-muted">Your appointment has been successfully booked. You will receive confirmations via SMS and email.</p>
+            </div>
+
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h6 class="mb-0">Booking Details</h6>
+                </div>
+                <div class="card-body">
+                    <div class="summary-row">
+                        <span class="summary-label">Booking ID:</span>
+                        <span class="summary-value fw-bold">BK21552</span>
+                    </div>
+                    <div class="summary-row">
+                        <span class="summary-label">Doctor:</span>
+                        <span class="summary-value">Dr {{ doctor.user.get_full_name }}</span>
+                    </div>
+                    <div class="summary-row">
+                        <span class="summary-label">Type:</span>
+                        <span class="summary-value">In-Person Consultation</span>
+                    </div>
+                    <div class="summary-row">
+                        <span class="summary-label">Service Charge:</span>
+                        <span class="summary-value highlight">৳50</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Next Steps -->
+            <div class="alert alert-info mb-4">
+                <h6 class="fw-bold mb-2">What's Next?</h6>
+                <ul class="mb-0 ms-3">
+                    <li>Check your SMS/Email for booking confirmation</li>
+                    <li>Complete payment through the provided link</li>
+                    <li>Save your booking ID for reference</li>
+                    <li>Arrive 10 minutes before your appointment time</li>
+                </ul>
+            </div>
+
+            <!-- Actions -->
+            <div class="d-grid gap-2">
+                <a href="{% url 'doctors:detail' doctor.id %}" class="btn btn-outline-primary btn-lg">
+                    <i class="bi bi-arrow-left me-2"></i>Back to Doctor Profile
+                </a>
+                <a href="/" class="btn btn-primary btn-lg">
+                    <i class="bi bi-house me-2"></i>Go to Home
+                </a>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Booking Summary Sidebar -->
+        <div class="col-lg-4">
+            <div class="card sticky-top" style="top: 20px;">
+                <div class="card-header">
+                    <h5 class="mb-0">Booking Summary</h5>
+                </div>
+                <div class="card-body">
+                    <!-- Doctor Info -->
+                    <div class="doctor-info mb-4 pb-4 border-bottom">
+                        {% if doctor.profile_picture %}
+                            <img src="{{ doctor.profile_picture.url }}" class="doctor-avatar" alt="Dr. {{ doctor.user.get_full_name }}">
+                        {% else %}
+                            <div style="width: 80px; height: 80px; border-radius: 50%; background-color: var(--primary-blue-light); display: flex; align-items: center; justify-content: center;">
+                                <i class="bi bi-person" style="font-size: 2rem; color: var(--primary-blue);"></i>
+                            </div>
+                        {% endif %}
+                        <div class="doctor-details">
+                            <h5 class="mb-1">Dr. {{ doctor.user.get_full_name }}</h5>
+                            <div class="doctor-specialization">
+                                {% for spec in doctor.specialties.all|slice:":1" %}{{ spec.name }}{% endfor %}
+                            </div>
+                            <div class="doctor-rating">
+                                <span class="stars">★★★★★</span>
+                                <span>(4.5)</span>
+                            </div>
+                            <div class="doctor-experience">
+                                <i class="bi bi-briefcase"></i>
+                                <span>15 years experience</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Summary Breakdown -->
+                    <div class="summary-section">
+                        <div class="summary-row">
+                            <span class="summary-label">Appointments:</span>
+                            <span class="summary-value">1</span>
+                        </div>
+                        <div class="summary-row">
+                            <span class="summary-label">Service Charge:</span>
+                            <span class="summary-value">৳50</span>
+                        </div>
+                        <div class="summary-row total">
+                            <span>Total:</span>
+                            <span class="text-primary">৳50</span>
+                        </div>
+                    </div>
+
+                    <!-- Contact Section -->
+                    <div class="contact-section">
+                        <div class="contact-title">Need Help?</div>
+                        <div class="contact-buttons">
+                            <a href="tel:+01700123456" class="contact-btn phone">
+                                <i class="bi bi-telephone"></i>
+                                <span>Call Us</span>
+                            </a>
+                            <a href="https://wa.me/01700123456" class="contact-btn whatsapp" target="_blank">
+                                <i class="bi bi-chat-dots"></i>
+                                <span>WhatsApp</span>
+                            </a>
+                            <a href="mailto:support@drseba.com" class="contact-btn email">
+                                <i class="bi bi-envelope"></i>
+                                <span>Email Support</span>
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Live Chat Info -->
+                    <div style="background-color: var(--light-bg); border-radius: var(--border-radius-md); padding: 1rem; margin-top: 1rem;">
+                        <small style="color: var(--muted-gray); font-weight: 500;">
+                            <i class="bi bi-chat-left-dots me-1" style="color: var(--primary-blue);"></i>
+                            Live chat available 24/7
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .payment-card {
+        border: 2px solid var(--subtle-border);
+        border-radius: var(--border-radius-lg);
+        cursor: pointer;
+        transition: all var(--transition-smooth);
+    }
+
+    .form-check-input:checked ~ label .payment-card {
+        border-color: var(--primary-blue);
+        background-color: var(--primary-blue-light);
+        box-shadow: var(--shadow-md);
+    }
+
+    .form-check-input:checked ~ label .card-selectable {
+        border-color: var(--primary-blue);
+        background-color: var(--primary-blue-light);
+    }
+</style>
+{% endblock %}

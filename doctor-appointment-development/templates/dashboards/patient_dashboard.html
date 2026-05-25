@@ -1,0 +1,498 @@
+{% extends 'base.html' %}
+
+{% block title %}Patient Dashboard - DrSeba.com{% endblock %}
+
+{% block content %}
+<div class="container-fluid" style="background-color: #f8f9fa; min-height: 100vh;">
+    <div class="row g-0">
+        <!-- Sidebar -->
+        <div class="col-md-3 col-lg-2 d-none d-md-block" style="background-color: #f8f9fa; border-right: 1px solid #e9ecef;">
+            <div class="p-3">
+                <!-- Logo Section -->
+                <div class="mb-4 pb-3 border-bottom">
+                    <div class="d-flex align-items-center">
+                        <div class="bg-primary rounded d-flex align-items-center justify-content-center me-2" style="width: 40px; height: 40px; font-weight: bold; color: white;">DS</div>
+                        <div>
+                            <h6 class="mb-0 fw-bold">DrSeba.com</h6>
+                            <small class="text-muted">Patient Portal</small>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- User Section -->
+                <div class="mb-4 pb-3 border-bottom">
+                    <div class="d-flex align-items-center">
+                        {% if profile.profile_picture %}
+                            <img src="{{ profile.profile_picture.url }}" class="rounded-circle me-2" style="width: 40px; height: 40px; object-fit: cover;" alt="">
+                        {% else %}
+                            <div class="bg-light rounded-circle d-flex align-items-center justify-content-center me-2" style="width: 40px; height: 40px;">
+                                <span class="fw-bold text-primary">P</span>
+                            </div>
+                        {% endif %}
+                        <div>
+                            <h6 class="mb-0 small fw-bold">{{ user.first_name }} {{ user.last_name }}</h6>
+                            <small class="text-muted">Patient</small>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Navigation -->
+                <nav class="nav flex-column gap-2">
+                    <a class="nav-link px-3 py-2 rounded tab-link active" href="#" data-tab="overview" style="background-color: #0A74DA; color: white;">
+                        <i class="bi bi-speedometer2 me-2"></i>Dashboard
+                    </a>
+                    <a class="nav-link px-3 py-2 rounded tab-link text-dark" href="#" data-tab="appointments">
+                        <i class="bi bi-calendar-check me-2"></i>Appointments
+                    </a>
+                    <a class="nav-link px-3 py-2 rounded tab-link text-dark" href="#" data-tab="doctors">
+                        <i class="bi bi-heart me-2"></i>Saved Doctors
+                    </a>
+                    <a class="nav-link px-3 py-2 rounded tab-link text-dark" href="#" data-tab="payments">
+                        <i class="bi bi-credit-card me-2"></i>Payments
+                    </a>
+                    <a class="nav-link px-3 py-2 rounded tab-link text-dark" href="#" data-tab="profile">
+                        <i class="bi bi-person me-2"></i>My Profile
+                    </a>
+                </nav>
+                
+                <!-- Logout -->
+                <div class="mt-5 pt-3 border-top">
+                    <a href="{% url 'accounts:logout' %}" class="nav-link px-3 py-2 text-danger">
+                        <i class="bi bi-box-arrow-right me-2"></i>Logout
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="col-md-9 col-lg-10">
+            <div class="p-4">
+                <!-- Header -->
+                <div class="mb-4 d-flex justify-content-between align-items-center">
+                    <div>
+                        <h4 class="fw-bold mb-1">Patient Dashboard</h4>
+                        <p class="text-muted mb-0">Welcome back, {{ user.first_name }}</p>
+                    </div>
+                </div>
+
+                <!-- TAB: OVERVIEW -->
+                <div class="tab-section" id="overview" style="display: block;">
+                    <!-- Stats Cards -->
+                <div class="row g-3 mb-4">
+                    <!-- Upcoming Appointments -->
+                    <div class="col-12 col-sm-6 col-md-3">
+                        <div class="card border-0 shadow-sm">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div>
+                                        <p class="text-muted mb-1 small">Upcoming</p>
+                                        <h3 class="fw-bold mb-2">{{ upcoming_appointments|length }}</h3>
+                                        <div class="d-flex align-items-center">
+                                            <i class="bi bi-calendar-event" style="color: #0A74DA; font-size: 0.9rem;"></i>
+                                            <span class="small ms-1" style="color: #0A74DA;">Scheduled</span>
+                                        </div>
+                                    </div>
+                                    <div class="bg-light rounded-3 p-3 d-flex align-items-center justify-content-center" style="width: 60px; height: 60px;">
+                                        <i class="bi bi-calendar-check" style="font-size: 1.8rem; color: #0A74DA;"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Completed Appointments -->
+                    <div class="col-12 col-sm-6 col-md-3">
+                        <div class="card border-0 shadow-sm">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div>
+                                        <p class="text-muted mb-1 small">Completed</p>
+                                        <h3 class="fw-bold mb-2">{{ past_appointments|length }}</h3>
+                                        <div class="d-flex align-items-center">
+                                            <i class="bi bi-check-circle" style="color: #28A745; font-size: 0.9rem;"></i>
+                                            <span class="small ms-1" style="color: #28A745;">Finished</span>
+                                        </div>
+                                    </div>
+                                    <div class="bg-light rounded-3 p-3 d-flex align-items-center justify-content-center" style="width: 60px; height: 60px;">
+                                        <i class="bi bi-check2-circle" style="font-size: 1.8rem; color: #28A745;"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Saved Doctors -->
+                    <div class="col-12 col-sm-6 col-md-3">
+                        <div class="card border-0 shadow-sm">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div>
+                                        <p class="text-muted mb-1 small">Saved Doctors</p>
+                                        <h3 class="fw-bold mb-2">{{ favorite_doctors|length }}</h3>
+                                        <div class="d-flex align-items-center">
+                                            <i class="bi bi-heart" style="color: #DC3545; font-size: 0.9rem;"></i>
+                                            <span class="small ms-1" style="color: #DC3545;">Favorites</span>
+                                        </div>
+                                    </div>
+                                    <div class="bg-light rounded-3 p-3 d-flex align-items-center justify-content-center" style="width: 60px; height: 60px;">
+                                        <i class="bi bi-heart-fill" style="font-size: 1.8rem; color: #DC3545;"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Payments -->
+                    <div class="col-12 col-sm-6 col-md-3">
+                        <div class="card border-0 shadow-sm">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div>
+                                        <p class="text-muted mb-1 small">Transactions</p>
+                                        <h3 class="fw-bold mb-2">{{ recent_payments|length }}</h3>
+                                        <div class="d-flex align-items-center">
+                                            <i class="bi bi-credit-card" style="color: #17C0EB; font-size: 0.9rem;"></i>
+                                            <span class="small ms-1" style="color: #17C0EB;">Recent</span>
+                                        </div>
+                                    </div>
+                                    <div class="bg-light rounded-3 p-3 d-flex align-items-center justify-content-center" style="width: 60px; height: 60px;">
+                                        <i class="bi bi-credit-card" style="font-size: 1.8rem; color: #17C0EB;"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TAB: APPOINTMENTS -->
+                <div class="tab-section" id="appointments" style="display: none;">
+                    <h5 class="fw-bold mb-4">Your Appointments</h5>
+
+                    <!-- Upcoming Appointments Section -->
+                    {% if upcoming_appointments %}
+                        {% for appt in upcoming_appointments %}
+                        <div class="card shadow-sm border-0 mb-3 appointment-card" style="border-left: 4px solid #0A74DA;">
+                            <div class="card-body p-4">
+                                <div class="row align-items-center">
+                                    <!-- Doctor Info -->
+                                    <div class="col-md-7">
+                                        <div class="d-flex">
+                                            {% if appt.doctor.profile_picture %}
+                                            <img src="{{ appt.doctor.profile_picture.url }}" class="rounded-2 me-3" width="70" height="70" alt="Dr. {{ appt.doctor.user.get_full_name }}" style="object-fit: cover;">
+                                            {% else %}
+                                            <div class="bg-light rounded-2 d-flex align-items-center justify-content-center me-3" style="width: 70px; height: 70px; min-width: 70px;">
+                                                <i class="bi bi-person fs-3 text-muted"></i>
+                                            </div>
+                                            {% endif %}
+                                            <div class="flex-grow-1">
+                                                <h6 class="fw-bold mb-1" style="color: #1F2937;">Dr. {{ appt.doctor.user.get_full_name }}</h6>
+                                                <small class="text-muted d-block mb-2">{{ appt.doctor.specialties.first.name|default:"General" }}</small>
+                                                <div>
+                                                    <small class="text-muted"><i class="bi bi-calendar me-1"></i>{{ appt.date|date:"M d, Y" }}</small>
+                                                    <small class="text-muted ms-3"><i class="bi bi-clock me-1"></i>{{ appt.time_slot }}</small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Status -->
+                                    <div class="col-md-2 text-center">
+                                        <span class="badge bg-warning" style="background-color: #FFA500 !important; padding: 0.5rem 0.75rem;">Pending</span>
+                                    </div>
+
+                                    <!-- Fee -->
+                                    <div class="col-md-2 text-center">
+                                        <div class="small">
+                                            <small class="d-block text-muted mb-1">Fee</small>
+                                            <span class="fw-bold" style="color: #0A74DA;">৳{{ appt.consultation_fee }}</span>
+                                        </div>
+                                    </div>
+
+                                    <!-- Actions -->
+                                    <div class="col-md-1 text-end">
+                                        <a href="{% url 'appointments:detail' appt.id %}" class="btn btn-sm btn-primary" style="background-color: #0A74DA; border-color: #0A74DA;">Details</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                    <div class="card shadow-sm border-0">
+                        <div class="card-body text-center py-5">
+                            <i class="bi bi-calendar-x fs-1 text-muted"></i>
+                            <p class="mt-3 text-muted">No upcoming appointments</p>
+                            <a href="{% url 'doctors:list' %}" class="btn btn-primary" style="background-color: #0A74DA; border-color: #0A74DA;">Book Now</a>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <!-- Past Appointments Section -->
+                <div id="past" class="mb-4">
+                    <h5 class="fw-bold mb-3">Completed Appointments</h5>
+                    {% if past_appointments %}
+                        {% for appt in past_appointments %}
+                        <div class="card shadow-sm border-0 mb-3 appointment-card appointment-completed" style="border-left: 4px solid #28A745;">
+                            <div class="card-body p-4">
+                                <div class="row align-items-center">
+                                    <!-- Doctor Info -->
+                                    <div class="col-md-7">
+                                        <div class="d-flex">
+                                            {% if appt.doctor.profile_picture %}
+                                            <img src="{{ appt.doctor.profile_picture.url }}" class="rounded-2 me-3" width="70" height="70" alt="Dr. {{ appt.doctor.user.get_full_name }}" style="object-fit: cover;">
+                                            {% else %}
+                                            <div class="bg-light rounded-2 d-flex align-items-center justify-content-center me-3" style="width: 70px; height: 70px; min-width: 70px;">
+                                                <i class="bi bi-person fs-3 text-muted"></i>
+                                            </div>
+                                            {% endif %}
+                                            <div class="flex-grow-1">
+                                                <h6 class="fw-bold mb-1" style="color: #1F2937;">Dr. {{ appt.doctor.user.get_full_name }}</h6>
+                                                <small class="text-muted d-block mb-2">{{ appt.doctor.specialties.first.name|default:"General" }}</small>
+                                                <div>
+                                                    <small class="text-muted"><i class="bi bi-calendar me-1"></i>{{ appt.date|date:"M d, Y" }}</small>
+                                                    <small class="text-muted ms-3"><i class="bi bi-clock me-1"></i>{{ appt.time_slot }}</small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Status -->
+                                    <div class="col-md-2 text-center">
+                                        <span class="badge bg-success" style="background-color: #28A745 !important; padding: 0.5rem 0.75rem;">Completed</span>
+                                    </div>
+
+                                    <!-- Payment -->
+                                    <div class="col-md-2 text-center">
+                                        <div class="small">
+                                            <small class="d-block text-muted mb-1">Payment</small>
+                                            <span class="fw-bold" style="color: #28A745;">{% if appt.is_paid %}Paid{% else %}Pending{% endif %}</span>
+                                        </div>
+                                    </div>
+
+                                    <!-- Actions -->
+                                    <div class="col-md-1 text-end">
+                                        <a href="{% url 'appointments:detail' appt.id %}" class="btn btn-sm btn-primary" style="background-color: #0A74DA; border-color: #0A74DA;">View Prescription</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                    <div class="card shadow-sm border-0">
+                        <div class="card-body text-center py-5">
+                            <i class="bi bi-check-circle fs-1 text-muted"></i>
+                            <p class="mt-3 text-muted">No completed appointments yet</p>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <!-- TAB: DOCTORS -->
+                <div class="tab-section" id="doctors" style="display: none;">
+                    <h5 class="fw-bold mb-4">Your Saved Doctors</h5>
+                    {% if favorite_doctors %}
+                        {% for doctor in favorite_doctors %}
+                        <div class="card shadow-sm border-0 mb-3" style="border-left: 4px solid #0A74DA;">
+                            <div class="card-body p-4">
+                                <div class="row align-items-center">
+                                    <!-- Doctor Info -->
+                                    <div class="col-md-6">
+                                        <div class="d-flex">
+                                            {% if doctor.profile_picture %}
+                                            <img src="{{ doctor.profile_picture.url }}" class="rounded-2 me-3" width="70" height="70" alt="Dr. {{ doctor.user.get_full_name }}" style="object-fit: cover;">
+                                            {% else %}
+                                            <div class="bg-light rounded-2 d-flex align-items-center justify-content-center me-3" style="width: 70px; height: 70px; min-width: 70px;">
+                                                <i class="bi bi-person fs-3 text-muted"></i>
+                                            </div>
+                                            {% endif %}
+                                            <div class="flex-grow-1">
+                                                <h6 class="fw-bold mb-1" style="color: #1F2937;">Dr. {{ doctor.user.get_full_name }}</h6>
+                                                <small class="text-muted d-block mb-2">{{ doctor.specialties.first.name|default:"General" }}</small>
+                                                <div>
+                                                    <small class="text-muted"><i class="bi bi-briefcase me-1"></i>{{ doctor.years_of_experience|default:"5" }} years experience</small>
+                                                    {% if doctor.consultation_fee %}
+                                                    <small class="text-muted ms-3"><i class="bi bi-currency-dollar me-1"></i>৳{{ doctor.consultation_fee }} consultation</small>
+                                                    {% endif %}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Actions -->
+                                    <div class="col-md-6 text-end">
+                                        <div class="d-flex gap-2 justify-content-end flex-wrap">
+                                            <a href="{% url 'doctors:detail' doctor.id %}" class="btn btn-sm btn-outline-primary" style="border-color: #0A74DA; color: #0A74DA; white-space: nowrap;">
+                                                <i class="bi bi-eye me-1"></i>View Profile
+                                            </a>
+                                            <a href="{% url 'appointments:book_doctor' doctor.id %}" class="btn btn-sm btn-primary" style="background-color: #0A74DA; border-color: #0A74DA; white-space: nowrap;">
+                                                <i class="bi bi-calendar-check me-1"></i>Book Now
+                                            </a>
+                                            <button class="btn btn-sm btn-outline-danger" onclick="removeSavedDoctor({{ doctor.id }})" style="white-space: nowrap;">
+                                                <i class="bi bi-trash me-1"></i>Remove
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                    <div class="card shadow-sm border-0">
+                        <div class="card-body text-center py-5">
+                            <i class="bi bi-heart fs-1 text-muted"></i>
+                            <p class="mt-3 text-muted">No saved doctors yet</p>
+                            <a href="{% url 'doctors:list' %}" class="btn btn-primary" style="background-color: #0A74DA; border-color: #0A74DA;">Find Doctors</a>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <!-- TAB: PAYMENTS -->
+                <div class="tab-section" id="payments" style="display: none;">
+                    <h5 class="fw-bold mb-4">Payment History</h5>
+                    {% if recent_payments %}
+                    <div class="card shadow-sm border-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>Doctor</th>
+                                        <th>Amount</th>
+                                        <th>Status</th>
+                                        <th>Invoice</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for payment in recent_payments %}
+                                    <tr>
+                                        <td><small>{{ payment.created_at|date:"M d, Y" }}</small></td>
+                                        <td>
+                                            <small>{% if payment.appointment.doctor %}Dr. {{ payment.appointment.doctor.user.get_full_name }}{% else %}N/A{% endif %}</small>
+                                        </td>
+                                        <td><span class="fw-bold">৳{{ payment.amount }}</span></td>
+                                        <td>
+                                            <span class="badge {% if payment.status == 'completed' %}bg-success{% elif payment.status == 'pending' %}bg-warning{% else %}bg-danger{% endif %}">
+                                                {{ payment.status|title }}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <a href="{% url 'payments:invoice' payment.id %}" class="btn btn-sm btn-outline-primary">
+                                                <i class="bi bi-download"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    {% else %}
+                    <div class="card shadow-sm border-0">
+                        <div class="card-body text-center py-5">
+                            <i class="bi bi-credit-card fs-1 text-muted"></i>
+                            <p class="mt-3 text-muted">No payment history</p>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <!-- TAB: PROFILE -->
+                <div class="tab-section" id="profile" style="display: none;">
+                    <h5 class="fw-bold mb-4">Profile Information</h5>
+                    <div class="row">
+                        <div class="col-md-8">
+                            <div class="card shadow-sm border-0">
+                                <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                                    <h6 class="fw-bold mb-0">Personal Details</h6>
+                                    <a href="{% url 'accounts:profile_update' %}" class="btn btn-sm btn-primary" style="background-color: #0A74DA; border-color: #0A74DA;">Edit</a>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row mb-4">
+                                        <div class="col-md-6">
+                                            <label class="fw-bold text-muted small d-block">First Name</label>
+                                            <p class="mb-0">{{ user.first_name }}</p>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="fw-bold text-muted small d-block">Last Name</label>
+                                            <p class="mb-0">{{ user.last_name }}</p>
+                                        </div>
+                                    </div>
+                                    <div class="row mb-4">
+                                        <div class="col-md-6">
+                                            <label class="fw-bold text-muted small d-block">Email</label>
+                                            <p class="mb-0">{{ user.email }}</p>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="fw-bold text-muted small d-block">Phone</label>
+                                            <p class="mb-0">{{ user.phone }}</p>
+                                        </div>
+                                    </div>
+                                    {% if profile %}
+                                        <div class="row mb-4">
+                                            <div class="col-md-6">
+                                                <label class="fw-bold text-muted small d-block">Blood Group</label>
+                                                <p class="mb-0">{{ profile.blood_group|default:"Not specified" }}</p>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label class="fw-bold text-muted small d-block">Gender</label>
+                                                <p class="mb-0">{{ profile.get_gender_display|default:"Not specified" }}</p>
+                                            </div>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card shadow-sm border-0">
+                                <div class="card-body text-center">
+                                    {% if profile.profile_picture %}
+                                    <img src="{{ profile.profile_picture.url }}" class="rounded-circle mb-3" width="100" height="100" alt="">
+                                    {% else %}
+                                    <div class="bg-light rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3" style="width: 100px; height: 100px;">
+                                        <i class="bi bi-person fs-1 text-muted"></i>
+                                    </div>
+                                    {% endif %}
+                                    <h6 class="fw-bold">{{ user.get_full_name }}</h6>
+                                    <p class="text-muted small mb-3">Patient Account</p>
+                                    <a href="{% url 'accounts:profile_update' %}" class="btn btn-sm btn-outline-primary w-100" style="border-color: #0A74DA; color: #0A74DA;">Update Photo</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Tab switching functionality
+document.querySelectorAll('.tab-link').forEach(link => {
+    link.addEventListener('click', function(e) {
+        e.preventDefault();
+        const tabName = this.getAttribute('data-tab');
+        
+        // Hide all tabs
+        document.querySelectorAll('.tab-section').forEach(tab => {
+            tab.style.display = 'none';
+        });
+        
+        // Remove active class from all links
+        document.querySelectorAll('.tab-link').forEach(l => {
+            l.classList.remove('active');
+            l.style.backgroundColor = '';
+            l.style.color = '';
+        });
+        
+        // Show selected tab
+        document.getElementById(tabName).style.display = 'block';
+        
+        // Add active class to clicked link
+        this.classList.add('active');
+        this.style.backgroundColor = '#0A74DA';
+        this.style.color = 'white';
+    });
+});
+</script>
+{% endblock %}

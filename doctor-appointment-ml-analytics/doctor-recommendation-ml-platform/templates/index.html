@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🏥 Doctor Recommendation System</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='75' font-size='75'>⚕️</text></svg>">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <div class="header-title">
+                    <h1>🏥 Doctor Recommendation System</h1>
+                    <p>AI-Powered Doctor Search with Quality Prediction</p>
+                </div>
+                <div class="header-badge">
+                    <span class="badge">500+ Doctors</span>
+                    <span class="badge">ML Powered</span>
+                    <span class="badge">Real-time</span>
+                </div>
+            </div>
+        </header>
+
+        <div class="main-content">
+            <!-- Left Column - Search Form -->
+            <aside class="search-panel">
+                <div class="search-container">
+                    <h2>🔍 Search Criteria</h2>
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="form-group">
+                            <label for="district">📍 District</label>
+                            <select id="district" name="district" required>
+                                <option value="">-- Select District --</option>
+                                {% for district in districts %}
+                                <option value="{{ district }}" {% if district == selected_district %}selected{% endif %}>{{ district }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="thana">🏘️ Thana/Area</label>
+                            <select id="thana" name="thana" required>
+                                <option value="">-- Select Thana --</option>
+                                {% for thana in thanas %}
+                                <option value="{{ thana }}" {% if thana == selected_thana %}selected{% endif %}>{{ thana }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="specialization">👨‍⚕️ Specialization</label>
+                            <select id="specialization" name="specialization" required>
+                                <option value="">-- Select Specialization --</option>
+                                {% for spec in specializations %}
+                                <option value="{{ spec }}" {% if spec == selected_spec %}selected{% endif %}>{{ spec }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="maxFee">💳 Max Consultation Fee (৳)</label>
+                            <input type="number" id="maxFee" name="maxFee" value="{{ max_fee|default:'2000' }}" min="0" required>
+                            <small>Maximum amount you're willing to pay</small>
+                        </div>
+
+                        <div class="form-group checkbox-group">
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="online" name="online" {% if online %}checked{% endif %}>
+                                <span>💻 Online Consultation Available</span>
+                            </label>
+                        </div>
+
+                        <div class="form-group checkbox-group">
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="emergency" name="emergency" {% if emergency %}checked{% endif %}>
+                                <span>🚨 Emergency Service Available</span>
+                            </label>
+                        </div>
+
+                        <button id="searchBtn" type="submit" class="search-btn">
+                            <span>🔍 Search Doctors</span>
+                        </button>
+
+                        {% if show_see_more_btn %}
+                        <form method="post" class="see-more-form">
+                            {% csrf_token %}
+                            <input type="hidden" name="district" value="{{ selected_district }}">
+                            <input type="hidden" name="thana" value="{{ selected_thana }}">
+                            <input type="hidden" name="specialization" value="{{ selected_spec }}">
+                            <input type="hidden" name="maxFee" value="{{ max_fee }}">
+                            <input type="hidden" name="online" value="{% if online %}on{% endif %}">
+                            <input type="hidden" name="emergency" value="{% if emergency %}on{% endif %}">
+                            <input type="hidden" name="show_all" value="true">
+                            <button type="submit" class="see-more-btn see-more-input-btn">See more</button>
+                        </form>
+                        {% endif %}
+
+                        <div id="apiStatus" class="api-status">
+                            <div class="status-indicator"></div>
+                            <span id="statusText">Powered by Django backend</span>
+                        </div>
+                    </form>
+                </div>
+            </aside>
+
+            <!-- Right Column - Results -->
+            <main class="results-panel">
+                <!-- Error Message -->
+                <div id="errorMessage" class="error-message {% if not error %}hidden{% endif %}">
+                    <span class="error-icon">❌</span>
+                    <span id="errorText">{{ error }}</span>
+                </div>
+
+                <!-- Loading Indicator -->
+                <div id="loading" class="loading-container hidden">
+                    <div class="spinner"></div>
+                    <p>Searching for best doctors...</p>
+                    <div class="progress-dots">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </div>
+                </div>
+
+                <!-- No Results -->
+                <div id="noResults" class="no-results {% if searched and not doctors and not error %}{% else %}hidden{% endif %}">
+                    <div class="no-results-icon">😢</div>
+                    <h3>No doctors found</h3>
+                    <p>Try adjusting your search criteria</p>
+                </div>
+
+                <!-- Results Section -->
+                <section id="resultsSection" class="results-section {% if doctors %}{% else %}hidden{% endif %}">
+                    <div class="results-header">
+                        <h2>
+                            <span id="resultCount">{{ displayed_doctors|length }}</span> Doctors Found
+                        </h2>
+                        <p>Ranked by AI Quality Score</p>
+                    </div>
+                    <div id="results" class="results-container">
+                        {% for doctor in displayed_doctors %}
+                        <div class="doctor-card">
+                            <div class="doctor-rank">
+                                <div class="rank-badge">#{{ forloop.counter }}</div>
+                                <div class="doctor-name">
+                                    <h3>{{ doctor.doctor_name }}</h3>
+                                    <div class="doctor-spec">{{ doctor.specialization|default:'General Practice' }}</div>
+                                </div>
+                            </div>
+
+                            <div class="doctor-info">
+                                <div class="info-item">
+                                    <div class="info-label">Rating</div>
+                                    <div class="info-value rating">⭐ {{ doctor.rating_avg|floatformat:1 }}/5.0</div>
+                                </div>
+                                <div class="info-item">
+                                    <div class="info-label">Experience</div>
+                                    <div class="info-value">{{ doctor.experience_years }} years</div>
+                                </div>
+                                <div class="info-item">
+                                    <div class="info-label">Consultation Fee</div>
+                                    <div class="info-value">৳{{ doctor.consultation_fees }}</div>
+                                </div>
+                                <div class="info-item">
+                                    <div class="info-label">Quality Score</div>
+                                    <div class="info-value">{{ doctor.predicted_score|floatformat:4 }}</div>
+                                </div>
+                            </div>
+
+                            {% if doctor.predicted_score > 1.5 %}
+                            <div class="score-badge score-excellent">Quality: Excellent ({{ doctor.predicted_score|floatformat:4 }})</div>
+                            {% elif doctor.predicted_score > 1.0 %}
+                            <div class="score-badge score-good">Quality: Good ({{ doctor.predicted_score|floatformat:4 }})</div>
+                            {% else %}
+                            <div class="score-badge score-fair">Quality: Fair ({{ doctor.predicted_score|floatformat:4 }})</div>
+                            {% endif %}
+
+                            <div class="hospital-info">
+                                <div class="hospital-name">🏥 {{ doctor.hospital_name }}</div>
+                                <div class="full-address">📍 {{ doctor.full_address }}</div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </section>
+
+                <!-- Empty State -->
+                <div id="emptyState" class="empty-state {% if searched or doctors %}hidden{% endif %}">
+                    <div class="empty-icon">👨‍⚕️</div>
+                    <h3>Welcome to Doctor Search</h3>
+                    <p>Fill in your search criteria and click "Search Doctors"</p>
+                    <ul class="features-list">
+                        <li>✓ 500+ qualified doctors</li>
+                        <li>✓ AI-powered quality scoring</li>
+                        <li>✓ Real-time recommendations</li>
+                        <li>✓ Comprehensive doctor information</li>
+                    </ul>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <p>🏥 Doctor Recommendation System powered by AI | Backend: <code>Django</code></p>
+    </footer>
+
+    <!-- No JavaScript needed - All logic handled by Django backend -->
+</body>
+</html>

@@ -1,0 +1,56 @@
+# Django
+*.log
+*.pot
+*.pyc
+__pycache__/
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
+media/
+staticfiles/
+
+# Environment
+.env
+.venv
+env/
+venv/
+ENV/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Backup files
+*.bak
+*.tmp
+
+# Keep deployment repo clean (exclude AI/reference docs)
+*.md
+!README.md
+
+# Local DB/setup artifacts
+*.sql
+
+# Non-deployment helper scripts
+add_appointments_payments.py
+cleanup_demo_data.py
+diagnose.py
+ngrok_share.py
+run_comprehensive_tests.py
+setup.py
+setup_complete_demo_data.py
+setup_demo_data.py
+setup_enhanced_demo_data.py
+setup_single_demo_accounts.py
+setup_mysql.py
+share_with_sqa.py
+start_with_ngrok.py
+test_mysql_connection.py
+ui_ux_audit.py

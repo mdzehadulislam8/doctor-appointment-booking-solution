@@ -1,0 +1,137 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Emergency Services - DrSeba.com{% endblock %}
+
+{% block content %}
+<div class="container mt-5 mb-5">
+    <!-- Page Header -->
+    <div class="row mb-5">
+        <div class="col-lg-10 mx-auto text-center">
+            <h1 class="fw-bold mb-3">🚨 Emergency Services</h1>
+            <p class="lead text-muted">Need immediate medical assistance? Our emergency hotlines are available 24/7 to help you</p>
+        </div>
+    </div>
+
+    <!-- Quick Call Buttons -->
+    <div class="row g-4 mb-5">
+        <div class="col-md-6 col-lg-3">
+            <div class="card h-100 shadow-sm border-0 text-center p-4">
+                <i class="bi bi-telephone-fill text-danger fs-1 mb-3"></i>
+                <h5 class="fw-bold">Ambulance Service</h5>
+                <p class="text-muted mb-3">Emergency ambulance pickup available</p>
+                <a href="tel:999" class="btn btn-danger btn-lg">
+                    <i class="bi bi-telephone-fill me-2"></i>Call 999
+                </a>
+            </div>
+        </div>
+        <div class="col-md-6 col-lg-3">
+            <div class="card h-100 shadow-sm border-0 text-center p-4">
+                <i class="bi bi-exclamation-circle-fill text-warning fs-1 mb-3"></i>
+                <h5 class="fw-bold">Emergency Hotline</h5>
+                <p class="text-muted mb-3">General emergency assistance</p>
+                <a href="tel:01700123456" class="btn btn-warning btn-lg">
+                    <i class="bi bi-telephone-fill me-2"></i>Call Now
+                </a>
+            </div>
+        </div>
+        <div class="col-md-6 col-lg-3">
+            <div class="card h-100 shadow-sm border-0 text-center p-4">
+                <i class="bi bi-hospital text-info fs-1 mb-3"></i>
+                <h5 class="fw-bold">Hospital Locator</h5>
+                <p class="text-muted mb-3">Find nearest hospital</p>
+                <a href="{% url 'doctors:list' %}" class="btn btn-info btn-lg">
+                    <i class="bi bi-map me-2"></i>Find Now
+                </a>
+            </div>
+        </div>
+        <div class="col-md-6 col-lg-3">
+            <div class="card h-100 shadow-sm border-0 text-center p-4">
+                <i class="bi bi-chat-dots-fill text-primary fs-1 mb-3"></i>
+                <h5 class="fw-bold">Chat Support</h5>
+                <p class="text-muted mb-3">Speak with our team</p>
+                <a href="mailto:emergency@drseba.com" class="btn btn-primary btn-lg">
+                    <i class="bi bi-chat-dots me-2"></i>Contact
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Emergency Guidelines -->
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <div class="card border-0 shadow-lg p-5 mb-4">
+                <h3 class="fw-bold mb-4">When to Seek Emergency Care</h3>
+                <div class="row g-4">
+                    <div class="col-md-6">
+                        <h5 class="text-danger fw-bold">🚨 Call Emergency Immediately If:</h5>
+                        <ul class="list-unstyled">
+                            <li class="mb-2"><i class="bi bi-exclamation-circle text-danger me-2"></i>Chest pain or pressure</li>
+                            <li class="mb-2"><i class="bi bi-exclamation-circle text-danger me-2"></i>Severe shortness of breath</li>
+                            <li class="mb-2"><i class="bi bi-exclamation-circle text-danger me-2"></i>Loss of consciousness</li>
+                            <li class="mb-2"><i class="bi bi-exclamation-circle text-danger me-2"></i>Severe bleeding</li>
+                            <li class="mb-2"><i class="bi bi-exclamation-circle text-danger me-2"></i>Suspected stroke symptoms</li>
+                            <li class="mb-2"><i class="bi bi-exclamation-circle text-danger me-2"></i>Severe allergic reaction</li>
+                            <li class="mb-2"><i class="bi bi-exclamation-circle text-danger me-2"></i>Poisoning or overdose</li>
+                            <li class="mb-2"><i class="bi bi-exclamation-circle text-danger me-2"></i>Serious injuries or trauma</li>
+                        </ul>
+                    </div>
+                    <div class="col-md-6">
+                        <h5 class="text-warning fw-bold">⚠️ Seek Care Within 1-2 Hours If:</h5>
+                        <ul class="list-unstyled">
+                            <li class="mb-2"><i class="bi bi-exclamation-triangle text-warning me-2"></i>Moderate abdominal pain</li>
+                            <li class="mb-2"><i class="bi bi-exclamation-triangle text-warning me-2"></i>High fever (above 103°F)</li>
+                            <li class="mb-2"><i class="bi bi-exclamation-triangle text-warning me-2"></i>Moderate burns</li>
+                            <li class="mb-2"><i class="bi bi-exclamation-triangle text-warning me-2"></i>Suspected fracture or dislocation</li>
+                            <li class="mb-2"><i class="bi bi-exclamation-triangle text-warning me-2"></i>Difficulty swallowing</li>
+                            <li class="mb-2"><i class="bi bi-exclamation-triangle text-warning me-2"></i>Persistent vomiting</li>
+                            <li class="mb-2"><i class="bi bi-exclamation-triangle text-warning me-2"></i>Uncontrolled bleeding</li>
+                            <li class="mb-2"><i class="bi bi-exclamation-triangle text-warning me-2"></i>Severe headache with stiff neck</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Emergency Contacts -->
+            <div class="card border-0 shadow-lg p-5">
+                <h3 class="fw-bold mb-4">Emergency Contact Numbers</h3>
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <div class="p-3 bg-light rounded border-start border-danger border-3">
+                            <h6 class="fw-bold text-danger">National Emergency</h6>
+                            <a href="tel:999" class="text-dark h5 fw-bold text-decoration-none">999</a>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="p-3 bg-light rounded border-start border-warning border-3">
+                            <h6 class="fw-bold text-warning">DrSeba Emergency</h6>
+                            <a href="tel:01700123456" class="text-dark h5 fw-bold text-decoration-none">01700-123456</a>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="p-3 bg-light rounded border-start border-success border-3">
+                            <h6 class="fw-bold text-success">Poison Control</h6>
+                            <a href="tel:01600999999" class="text-dark h5 fw-bold text-decoration-none">01600-999999</a>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="p-3 bg-light rounded border-start border-info border-3">
+                            <h6 class="fw-bold text-info">Mental Health Crisis</h6>
+                            <a href="tel:01700000000" class="text-dark h5 fw-bold text-decoration-none">01700-000000</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Back Link -->
+    <div class="row mt-5">
+        <div class="col-lg-8 mx-auto text-center">
+            <a href="{% url 'home' %}" class="btn btn-outline-primary">
+                <i class="bi bi-arrow-left me-2"></i>Back to Home
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

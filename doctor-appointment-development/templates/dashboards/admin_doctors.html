@@ -1,0 +1,855 @@
+{% extends 'base.html' %}
+
+{% block title %}Doctors & Hospitals - DrSeba.com{% endblock %}
+
+{% block content %}
+<div class="container-fluid" style="background-color: #f8f9fa; min-height: 100vh;">
+    <div class="row g-0">
+        <!-- Sidebar -->
+        <div class="col-md-3 col-lg-2 d-none d-md-block" style="background-color: #f8f9fa; border-right: 1px solid #e9ecef;">
+            <div class="p-3">
+                <!-- Logo Section -->
+                <div class="mb-4 pb-3 border-bottom">
+                    <div class="d-flex align-items-center">
+                        <div class="bg-primary rounded d-flex align-items-center justify-content-center me-2" style="width: 40px; height: 40px; font-weight: bold; color: white;">DS</div>
+                        <div>
+                            <h6 class="mb-0 fw-bold">DrSeba.com</h6>
+                            <small class="text-muted">Admin Panel</small>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- User Section -->
+                <div class="mb-4 pb-3 border-bottom">
+                    <div class="d-flex align-items-center">
+                        <div class="bg-light rounded-circle d-flex align-items-center justify-content-center me-2" style="width: 36px; height: 36px;">
+                            <span class="fw-bold text-primary">A</span>
+                        </div>
+                        <div>
+                            <h6 class="mb-0 small fw-bold">Admin User</h6>
+                            <small class="text-muted">Admin</small>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Navigation -->
+                <nav class="nav flex-column gap-1">
+                    <a class="nav-link px-3 py-2 rounded text-dark" href="{% url 'dashboard:admin_dashboard' %}">
+                        <i class="bi bi-speedometer2 me-2"></i>Dashboard
+                    </a>
+                    <a class="nav-link px-3 py-2 rounded text-dark" href="{% url 'dashboard:admin_employees' %}">
+                        <i class="bi bi-people me-2"></i>Employees
+                    </a>
+                    <a class="nav-link active px-3 py-2 rounded" href="{% url 'dashboard:admin_doctors' %}" style="background-color: #0A74DA; color: white;">
+                        <i class="bi bi-heart-pulse me-2"></i>Doctors & Hospitals
+                    </a>
+                    <a class="nav-link px-3 py-2 rounded text-dark" href="{% url 'dashboard:admin_appointments' %}">
+                        <i class="bi bi-calendar-check me-2"></i>Appointments
+                    </a>
+                    <a class="nav-link px-3 py-2 rounded text-dark" href="{% url 'dashboard:admin_payments' %}">
+                        <i class="bi bi-credit-card me-2"></i>Payments
+                    </a>
+                    <a class="nav-link px-3 py-2 rounded text-dark" href="{% url 'dashboard:admin_statistics' %}">
+                        <i class="bi bi-bar-chart-line me-2"></i>Analytics & Reports
+                    </a>
+                </nav>
+                
+                <!-- Logout -->
+                <div class="mt-5 pt-3 border-top">
+                    <a href="{% url 'accounts:logout' %}" class="nav-link px-3 py-2 text-danger">
+                        <i class="bi bi-box-arrow-right me-2"></i>Logout
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="col-md-9 col-lg-10">
+            <div class="p-4">
+                <!-- Header with Button -->
+                <div class="mb-4 d-flex justify-content-between align-items-center">
+                    <div>
+                        <h4 class="fw-bold mb-0">Doctors & Hospitals</h4>
+                    </div>
+                    <button class="btn btn-primary fw-bold" id="addBtn" data-bs-toggle="modal" data-bs-target="#addDoctorModal">
+                        <i class="bi bi-plus-lg me-2"></i>Add Doctor
+                    </button>
+                </div>
+                
+                <!-- Tabs for Doctors and Hospitals -->
+                <div class="mb-4">
+                    <ul class="nav nav-tabs" id="doctorHospitalTabs" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active fw-bold" id="doctors-tab" data-bs-toggle="tab" data-bs-target="#doctors-tab-content" type="button" role="tab">
+                                <i class="bi bi-heart-pulse me-2"></i>Doctors
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link fw-bold" id="hospitals-tab" data-bs-toggle="tab" data-bs-target="#hospitals-tab-content" type="button" role="tab">
+                                <i class="bi bi-hospital me-2"></i>Hospitals
+                            </button>
+                        </li>
+                    </ul>
+                </div>
+                
+                <!-- Tab Content -->
+                <div class="tab-content" id="doctorHospitalTabContent">
+                    <!-- Doctors Tab -->
+                    <div class="tab-pane fade show active" id="doctors-tab-content" role="tabpanel">
+                        <!-- Search Bar -->
+                        <div class="mb-4">
+                            <div class="input-group position-relative" style="max-width: 400px;">
+                                <span class="input-group-text bg-white border-end-0">
+                                    <i class="bi bi-search"></i>
+                                </span>
+                                <input type="text" class="form-control border-start-0" id="doctorSearchInput" placeholder="Search doctors..." oninput="searchDoctors()">
+                                <ul class="list-group position-absolute w-100" id="doctorSuggestions" style="top: 100%; left: 0; z-index: 1000; max-height: 250px; overflow-y: auto; display: none; border: 1px solid #dee2e6; border-top: none;"></ul>
+                            </div>
+                        </div>
+                        
+                        <!-- Doctors Table -->
+                        <div class="card border-0 shadow-sm">
+                            <div class="card-body p-0">
+                                <div class="table-responsive">
+                                    <table class="table table-hover mb-0 table-sm">
+                                        <thead class="table-light">
+                                            <tr>
+                                                <th class="text-muted small fw-bold">Doctor ID</th>
+                                                <th class="text-muted small fw-bold">Doctor Name</th>
+                                                <th class="text-muted small fw-bold">Age</th>
+                                                <th class="text-muted small fw-bold">Specialty</th>
+                                                <th class="text-muted small fw-bold">Registration Date</th>
+                                                <th class="text-muted small fw-bold">Hospital</th>
+                                                <th class="text-muted small fw-bold">Hospital ID</th>
+                                                <th class="text-muted small fw-bold">Consultation Fee</th>
+                                                <th class="text-muted small fw-bold">Available Time</th>
+                                                <th class="text-muted small fw-bold">Service Charge</th>
+                                                <th class="text-muted small fw-bold">Patient Count</th>
+                                                <th class="text-muted small fw-bold">Consultation %</th>
+                                                <th class="text-muted small fw-bold">Status</th>
+                                                <th class="text-muted small fw-bold">Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for doctor in doctors %}
+                                            <tr>
+                                                <td class="small">DOC-{{ doctor.id }}</td>
+                                                <td class="small fw-bold">
+                                                    <a href="{% url 'doctors:detail' doctor.id %}" class="text-primary text-decoration-none">Dr. {{ doctor.get_full_name }}</a>
+                                                </td>
+                                                <td class="small">{{ doctor.age }}</td>
+                                                <td class="small">
+                                                    {% if doctor.specialties.exists %}
+                                                        {{ doctor.specialties.first.name }}
+                                                    {% else %}
+                                                        General
+                                                    {% endif %}
+                                                </td>
+                                                <td class="small">{{ doctor.created_at|date:"Y-m-d" }}</td>
+                                                <td class="small">
+                                                    {% with primary_hospital=doctor.hospitals.filter|first %}
+                                                        {% if doctor.hospitals.exists %}
+                                                            {{ doctor.hospitals.first.hospital.name }}
+                                                        {% else %}
+                                                            -
+                                                        {% endif %}
+                                                    {% endwith %}
+                                                </td>
+                                                <td class="small">
+                                                    {% if doctor.hospitals.exists %}
+                                                        HOS-{{ doctor.hospitals.first.hospital.id }}
+                                                    {% else %}
+                                                        -
+                                                    {% endif %}
+                                                </td>
+                                                <td class="small">৳{{ doctor.consultation_fee|default:"0" }}</td>
+                                                <td class="small">09:00 - 17:00</td>
+                                                <td class="small">৳500</td>
+                                                <td class="small">{{ doctor.appointments.count }}</td>
+                                                <td class="small">
+                                                    <span class="badge bg-light text-dark">5.0%</span>
+                                                </td>
+                                                <td class="small">
+                                                    <form method="post" action="{% url 'dashboard:toggle_doctor_status' doctor.id %}" style="display: inline;">
+                                                        {% csrf_token %}
+                                                        {% if doctor.is_verified and doctor.is_active %}
+                                                            <button type="submit" class="btn btn-sm btn-success" style="border: none; padding: 0.25rem 0.75rem; font-size: 0.75rem;">Active</button>
+                                                        {% else %}
+                                                            <button type="submit" class="btn btn-sm btn-warning" style="border: none; padding: 0.25rem 0.75rem; font-size: 0.75rem;">Inactive</button>
+                                                        {% endif %}
+                                                    </form>
+                                                </td>
+                                                <td>
+                                                    <div class="btn-group btn-group-sm" role="group">
+                                                        <a href="{% url 'dashboard:admin_doctor_detail' doctor.id %}" class="btn btn-sm btn-link text-primary p-0 me-2" title="View Details">
+                                                            <i class="bi bi-eye"></i>
+                                                        </a>
+                                                        <form method="post" action="#" style="display: inline;" onsubmit="if(!confirm('Are you sure you want to delete this doctor?')) return false;">
+                                                            {% csrf_token %}
+                                                            <button type="submit" class="btn btn-sm btn-link text-danger p-0" title="Delete" onclick="alert('Delete functionality coming soon')">
+                                                                <i class="bi bi-trash"></i>
+                                                            </button>
+                                                        </form>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            {% empty %}
+                                            <tr>
+                                                <td colspan="14" class="text-center py-4 text-muted">
+                                                    No doctors found
+                                                </td>
+                                            </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Hospitals Tab -->
+                    <div class="tab-pane fade" id="hospitals-tab-content" role="tabpanel">
+                        <!-- Search Bar -->
+                        <div class="mb-4">
+                            <div class="input-group position-relative" style="max-width: 400px;">
+                                <span class="input-group-text bg-white border-end-0">
+                                    <i class="bi bi-search"></i>
+                                </span>
+                                <input type="text" class="form-control border-start-0" id="hospitalSearchInput" placeholder="Search hospitals..." oninput="searchHospitals()">
+                                <ul class="list-group position-absolute w-100" id="hospitalSuggestions" style="top: 100%; left: 0; z-index: 1000; max-height: 250px; overflow-y: auto; display: none; border: 1px solid #dee2e6; border-top: none;"></ul>
+                            </div>
+                        </div>
+                        
+                        <!-- Hospitals Grid -->
+                        <div class="row g-3">
+                            {% for hospital in hospitals %}
+                            <div class="col-12 col-md-6 col-lg-6">
+                                <div class="card border-0 shadow-sm h-100">
+                                    <div class="card-header bg-white border-bottom d-flex justify-content-between align-items-start">
+                                        <div>
+                                            <h5 class="card-title fw-bold mb-1">{{ hospital.name }}</h5>
+                                            <small class="text-muted">HOS-{{ hospital.id }}</small>
+                                        </div>
+                                        <div class="btn-group btn-group-sm" role="group">
+                                            <button type="button" class="btn btn-sm btn-link text-primary p-0 me-2" title="Edit" data-bs-toggle="modal" data-bs-target="#editHospitalModal" onclick="loadHospitalData({{ hospital.id }}, '{{ hospital.name }}', '{{ hospital.city }}', '{{ hospital.phone }}', '{{ hospital.email }}', {{ hospital.total_beds }}, {{ hospital.icu_beds_available }}, {{ hospital.doctors.count }})">
+                                                <i class="bi bi-pencil-square"></i>
+                                            </button>
+                                            <button type="button" class="btn btn-sm btn-link text-danger p-0" title="Delete" onclick="alert('Delete functionality coming soon')">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="mb-3">
+                                            <label class="text-muted small mb-1">Contact</label>
+                                            <p class="mb-0">{{ hospital.phone }}</p>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="text-muted small mb-1">Email</label>
+                                            <p class="mb-0">{{ hospital.email }}</p>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="text-muted small mb-1">Total Beds</label>
+                                            <p class="mb-0">{{ hospital.total_beds }}</p>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="text-muted small mb-1">ICU Beds Available</label>
+                                            <p class="mb-0">{{ hospital.icu_beds_available|default:"N/A" }}</p>
+                                        </div>
+                                        <div>
+                                            <label class="text-muted small mb-1">Doctors</label>
+                                            <p class="mb-0" style="font-weight: 600; color: #0A74DA;">{{ hospital.doctors.count }}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            {% empty %}
+                            <div class="col-12">
+                                <div class="text-center py-5 text-muted">
+                                    <i class="bi bi-hospital" style="font-size: 3rem; opacity: 0.3; margin-bottom: 1rem; display: block;"></i>
+                                    <p>No hospitals found</p>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Hospital Modal -->
+<div class="modal fade" id="editHospitalModal" tabindex="-1" aria-labelledby="editHospitalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content border-0">
+            <div class="modal-header bg-light border-bottom">
+                <h5 class="modal-title fw-bold" id="editHospitalLabel">Edit Hospital</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form method="post" id="editHospitalForm" action="#">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <!-- Hospital ID (Read-only) -->
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="hospitalId" class="form-label fw-bold">Hospital ID <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="hospitalId" value="HOS-001" readonly style="background-color: #f0f0f0;">
+                        </div>
+                    </div>
+
+                    <!-- Hospital Name -->
+                    <div class="row mb-3">
+                        <div class="col-md-12">
+                            <label for="hospitalName" class="form-label fw-bold">Hospital Name <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="hospitalName" name="hospital_name" placeholder="Enter hospital name" required>
+                        </div>
+                    </div>
+
+                    <!-- Location -->
+                    <div class="row mb-3">
+                        <div class="col-md-12">
+                            <label for="location" class="form-label fw-bold">Location <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="location" name="location" placeholder="Enter location" required>
+                        </div>
+                    </div>
+
+                    <!-- Contact Number -->
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="contactNumber" class="form-label fw-bold">Contact Number <span class="text-danger">*</span></label>
+                            <input type="tel" class="form-control" id="contactNumber" name="contact_number" placeholder="02-8626812" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="email" class="form-label fw-bold">Email <span class="text-danger">*</span></label>
+                            <input type="email" class="form-control" id="email" name="email" placeholder="info@example.com" required>
+                        </div>
+                    </div>
+
+                    <!-- Total Beds -->
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <label for="totalBeds" class="form-label fw-bold">Total Beds</label>
+                            <input type="number" class="form-control" id="totalBeds" name="total_beds" placeholder="150" min="0">
+                        </div>
+                        <div class="col-md-4">
+                            <label for="icuBeds" class="form-label fw-bold">ICU Beds</label>
+                            <input type="number" class="form-control" id="icuBeds" name="icu_beds" placeholder="12" min="0">
+                        </div>
+                        <div class="col-md-4">
+                            <label for="numDoctors" class="form-label fw-bold">Number of Doctors</label>
+                            <input type="number" class="form-control" id="numDoctors" name="num_doctors" placeholder="45" min="0" readonly style="background-color: #f0f0f0;">
+                        </div>
+                    </div>
+
+                    <!-- Status -->
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="status" class="form-label fw-bold">Status <span class="text-danger">*</span></label>
+                            <select class="form-select" id="status" name="status" required>
+                                <option value="active">Active</option>
+                                <option value="inactive">Inactive</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer bg-light border-top">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary fw-bold">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Add Doctor Modal -->
+<div class="modal fade" id="addDoctorModal" tabindex="-1" aria-labelledby="addDoctorLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content border-0">
+            <div class="modal-header bg-light border-bottom">
+                <h5 class="modal-title fw-bold" id="addDoctorLabel">Add New Doctor</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form method="post" id="addDoctorForm" action="/dashboard/admin/doctors/create/">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <!-- Doctor Email -->
+                    <div class="row mb-3">
+                        <div class="col-md-12">
+                            <label for="doctorEmail" class="form-label fw-bold">Doctor Email <span class="text-danger">*</span></label>
+                            <input type="email" class="form-control" id="doctorEmail" name="email" placeholder="doctor@example.com" required>
+                            <small class="text-muted">Doctor account will be created with this email</small>
+                        </div>
+                    </div>
+
+                    <!-- Full Name -->
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="firstName" class="form-label fw-bold">First Name <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="firstName" name="first_name" placeholder="John" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="lastName" class="form-label fw-bold">Last Name <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="lastName" name="last_name" placeholder="Doe" required>
+                        </div>
+                    </div>
+
+                    <!-- BMDC Number -->
+                    <div class="row mb-3">
+                        <div class="col-md-12">
+                            <label for="bmdcNumber" class="form-label fw-bold">BMDC Registration Number <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="bmdcNumber" name="bmdc_number" placeholder="BMDC-12345" required>
+                        </div>
+                    </div>
+
+                    <!-- Specialization -->
+                    <div class="row mb-3">
+                        <div class="col-md-12">
+                            <label for="specialty" class="form-label fw-bold">Specialty <span class="text-danger">*</span></label>
+                            <select class="form-select" id="specialty" name="specialty" required>
+                                <option value="">Select Specialty</option>
+                                <option value="cardiology">Cardiology</option>
+                                <option value="dermatology">Dermatology</option>
+                                <option value="gynecology">Gynecology</option>
+                                <option value="orthopedics">Orthopedics</option>
+                                <option value="general">General Medicine</option>
+                                <option value="pediatrics">Pediatrics</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Experience Years -->
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="experienceYears" class="form-label fw-bold">Years of Experience</label>
+                            <input type="number" class="form-control" id="experienceYears" name="experience_years" placeholder="5" min="0">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="qualification" class="form-label fw-bold">Qualification <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="qualification" name="qualification" placeholder="MBBS, MD" required>
+                        </div>
+                    </div>
+
+                    <!-- Hospital -->
+                    <div class="row mb-3">
+                        <div class="col-md-12">
+                            <label for="hospital" class="form-label fw-bold">Hospital</label>
+                            <select class="form-select" id="hospital" name="hospital">
+                                <option value="">Select Hospital</option>
+                                {% for hospital in hospitals %}
+                                <option value="{{ hospital.id }}">{{ hospital.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Consultation Fee -->
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="consultationFeeOnline" class="form-label fw-bold">Online Consultation Fee (৳)</label>
+                            <input type="number" class="form-control" id="consultationFeeOnline" name="consultation_fee_online" placeholder="500" min="0" step="100">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="consultationFeeInPerson" class="form-label fw-bold">In-Person Consultation Fee (৳)</label>
+                            <input type="number" class="form-control" id="consultationFeeInPerson" name="consultation_fee_in_person" placeholder="800" min="0" step="100">
+                        </div>
+                    </div>
+
+                    <!-- Status -->
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="doctorStatus" class="form-label fw-bold">Status <span class="text-danger">*</span></label>
+                            <select class="form-select" id="doctorStatus" name="status" required>
+                                <option value="active">Active</option>
+                                <option value="inactive">Inactive</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer bg-light border-top">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary fw-bold">Add Doctor</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Add Hospital Modal -->
+<div class="modal fade" id="addHospitalModal" tabindex="-1" aria-labelledby="addHospitalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content border-0">
+            <div class="modal-header bg-light border-bottom">
+                <h5 class="modal-title fw-bold" id="addHospitalLabel">Add New Hospital</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form method="post" id="addHospitalForm" action="/dashboard/admin/hospitals/create/">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <!-- Hospital Name -->
+                    <div class="row mb-3">
+                        <div class="col-md-12">
+                            <label for="newHospitalName" class="form-label fw-bold">Hospital Name <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="newHospitalName" name="hospital_name" placeholder="Enter hospital name" required>
+                        </div>
+                    </div>
+
+                    <!-- Location -->
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="newLocation" class="form-label fw-bold">Location <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="newLocation" name="location" placeholder="City/District" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="newAddress" class="form-label fw-bold">Address <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="newAddress" name="address" placeholder="Full address" required>
+                        </div>
+                    </div>
+
+                    <!-- Contact Information -->
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="newContactNumber" class="form-label fw-bold">Contact Number <span class="text-danger">*</span></label>
+                            <input type="tel" class="form-control" id="newContactNumber" name="contact_number" placeholder="02-8626812" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="newEmail" class="form-label fw-bold">Email <span class="text-danger">*</span></label>
+                            <input type="email" class="form-control" id="newEmail" name="email" placeholder="info@hospital.com" required>
+                        </div>
+                    </div>
+
+                    <!-- Beds Information -->
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="newTotalBeds" class="form-label fw-bold">Total Beds <span class="text-danger">*</span></label>
+                            <input type="number" class="form-control" id="newTotalBeds" name="total_beds" placeholder="150" min="0" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="newIcuBeds" class="form-label fw-bold">ICU Beds <span class="text-danger">*</span></label>
+                            <input type="number" class="form-control" id="newIcuBeds" name="icu_beds" placeholder="12" min="0" required>
+                        </div>
+                    </div>
+
+                    <!-- Website -->
+                    <div class="row mb-3">
+                        <div class="col-md-12">
+                            <label for="newWebsite" class="form-label fw-bold">Website (Optional)</label>
+                            <input type="url" class="form-control" id="newWebsite" name="website" placeholder="https://example.com">
+                        </div>
+                    </div>
+
+                    <!-- Status -->
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="hospitalStatus" class="form-label fw-bold">Status <span class="text-danger">*</span></label>
+                            <select class="form-select" id="hospitalStatus" name="status" required>
+                                <option value="active">Active</option>
+                                <option value="inactive">Inactive</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer bg-light border-top">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary fw-bold">Add Hospital</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- JavaScript for Modal -->
+<script>
+    // Handle tab switching for button change
+    document.getElementById('doctors-tab').addEventListener('click', function() {
+        const addBtn = document.getElementById('addBtn');
+        addBtn.setAttribute('data-bs-target', '#addDoctorModal');
+        addBtn.innerHTML = '<i class="bi bi-plus-lg me-2"></i>Add Doctor';
+    });
+
+    document.getElementById('hospitals-tab').addEventListener('click', function() {
+        const addBtn = document.getElementById('addBtn');
+        addBtn.setAttribute('data-bs-target', '#addHospitalModal');
+        addBtn.innerHTML = '<i class="bi bi-plus-lg me-2"></i>Add Hospital';
+    });
+
+    function loadHospitalData(id, name, location, phone, email, totalBeds, icuBeds, numDoctors) {
+        // Populate form fields with hospital data
+        document.getElementById('hospitalId').value = 'HOS-' + String(id).padStart(3, '0');
+        document.getElementById('hospitalName').value = name;
+        document.getElementById('location').value = location;
+        document.getElementById('contactNumber').value = phone;
+        document.getElementById('email').value = email;
+        document.getElementById('totalBeds').value = totalBeds;
+        document.getElementById('icuBeds').value = icuBeds;
+        document.getElementById('numDoctors').value = numDoctors;
+        
+        // Set the form action to update endpoint
+        document.getElementById('editHospitalForm').action = '/dashboard/admin/hospitals/update/' + id + '/';
+    }
+</script>
+
+<style>
+    .table-hover tbody tr:hover {
+        background-color: #f8f9fa;
+    }
+    
+    .bg-light {
+        background-color: #f0f4f8 !important;
+    }
+    
+    .card {
+        border-radius: 8px;
+    }
+    
+    .nav-link {
+        color: #6B7280 !important;
+        transition: all 0.3s ease;
+    }
+    
+    .nav-link:hover {
+        background-color: #f0f4f8 !important;
+    }
+    
+    .nav-link.active {
+        background-color: #0A74DA !important;
+        color: white !important;
+    }
+    
+    /* Tab Styling */
+    .nav-tabs {
+        border-bottom: 2px solid #e9ecef;
+    }
+    
+    .nav-tabs .nav-link {
+        border: none;
+        color: #6B7280 !important;
+        border-bottom: 3px solid transparent;
+        margin-bottom: -2px;
+        transition: all 0.3s ease;
+    }
+    
+    .nav-tabs .nav-link:hover {
+        border-bottom-color: #0A74DA !important;
+        background-color: transparent !important;
+    }
+    
+    .nav-tabs .nav-link.active {
+        border-bottom-color: #0A74DA !important;
+        background-color: transparent !important;
+        color: #0A74DA !important;
+    }
+    
+    /* Table responsive styling */
+    .table-responsive {
+        border-radius: 8px;
+    }
+    
+    .table.table-sm td {
+        padding: 0.75rem;
+    }
+    
+    /* Hospital card styling */
+    .card-header {
+        padding: 1.5rem;
+    }
+    
+    .card-body {
+        padding: 1.5rem;
+    }
+    
+    .card-title {
+        font-size: 1rem;
+    }
+    
+    /* Modal Styling */
+    .modal-content {
+        border-radius: 8px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+    }
+    
+    .modal-dialog {
+        max-width: 600px;
+    }
+    
+    .modal-header {
+        border-radius: 8px 8px 0 0;
+    }
+    
+    .form-label {
+        font-size: 0.95rem;
+        color: #333;
+        margin-bottom: 0.5rem;
+    }
+    
+    .form-control, .form-select {
+        border: 1px solid #e0e0e0;
+        border-radius: 4px;
+        padding: 0.75rem;
+        font-size: 0.95rem;
+    }
+    
+    .form-control:focus, .form-select:focus {
+        border-color: #0A74DA;
+        box-shadow: 0 0 0 0.2rem rgba(10, 116, 218, 0.25);
+    }
+    
+    .btn-primary {
+        background-color: #0A74DA;
+        border-color: #0A74DA;
+        padding: 0.75rem 2rem;
+    }
+    
+    .btn-primary:hover {
+        background-color: #0860b0;
+        border-color: #0860b0;
+    }
+
+    .suggestion-item {
+        padding: 0.75rem 1rem;
+        cursor: pointer;
+        border-bottom: 1px solid #f0f0f0;
+        transition: background-color 0.2s ease;
+    }
+
+    .suggestion-item:hover {
+        background-color: #f0f0f0;
+    }
+
+    .suggestion-item:last-child {
+        border-bottom: none;
+    }
+</style>
+
+<script>
+// Doctor Search Function
+function searchDoctors() {
+    const input = document.getElementById('doctorSearchInput');
+    const suggestionsBox = document.getElementById('doctorSuggestions');
+    const query = input.value.trim();
+
+    if (query.length < 1) {
+        suggestionsBox.style.display = 'none';
+        return;
+    }
+
+    fetch(`{% url 'dashboard:search_doctors' %}?q=${encodeURIComponent(query)}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.success && data.results.length > 0) {
+                displayDoctorSuggestions(data.results, suggestionsBox);
+                suggestionsBox.style.display = 'block';
+            } else {
+                suggestionsBox.style.display = 'none';
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching doctor suggestions:', error);
+            suggestionsBox.style.display = 'none';
+        });
+}
+
+// Display Doctor Suggestions
+function displayDoctorSuggestions(results, container) {
+    container.innerHTML = '';
+    results.forEach(result => {
+        const item = document.createElement('li');
+        item.className = 'list-group-item suggestion-item';
+        item.textContent = result.display;
+        item.onclick = () => {
+            document.getElementById('doctorSearchInput').value = result.display;
+            container.style.display = 'none';
+            filterDoctorsTable(result.display);
+        };
+        container.appendChild(item);
+    });
+}
+
+// Filter Doctors Table
+function filterDoctorsTable(searchTerm) {
+    const table = document.querySelector('.tab-pane.active .table tbody');
+    const rows = table.querySelectorAll('tr');
+    
+    rows.forEach(row => {
+        const text = row.textContent.toLowerCase();
+        if (text.includes(searchTerm.toLowerCase())) {
+            row.style.display = '';
+        } else {
+            row.style.display = 'none';
+        }
+    });
+}
+
+// Hospital Search Function
+function searchHospitals() {
+    const input = document.getElementById('hospitalSearchInput');
+    const suggestionsBox = document.getElementById('hospitalSuggestions');
+    const query = input.value.trim();
+
+    if (query.length < 1) {
+        suggestionsBox.style.display = 'none';
+        return;
+    }
+
+    fetch(`{% url 'dashboard:search_hospitals' %}?q=${encodeURIComponent(query)}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.success && data.results.length > 0) {
+                displayHospitalSuggestions(data.results, suggestionsBox);
+                suggestionsBox.style.display = 'block';
+            } else {
+                suggestionsBox.style.display = 'none';
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching hospital suggestions:', error);
+            suggestionsBox.style.display = 'none';
+        });
+}
+
+// Display Hospital Suggestions
+function displayHospitalSuggestions(results, container) {
+    container.innerHTML = '';
+    results.forEach(result => {
+        const item = document.createElement('li');
+        item.className = 'list-group-item suggestion-item';
+        item.textContent = result.display;
+        item.onclick = () => {
+            document.getElementById('hospitalSearchInput').value = result.display;
+            container.style.display = 'none';
+            filterHospitalsGrid(result.display);
+        };
+        container.appendChild(item);
+    });
+}
+
+// Filter Hospitals Grid
+function filterHospitalsGrid(searchTerm) {
+    const cards = document.querySelectorAll('#hospitals-tab-content .card');
+    cards.forEach(card => {
+        const text = card.textContent.toLowerCase();
+        if (text.includes(searchTerm.toLowerCase())) {
+            card.closest('.col-12').style.display = '';
+        } else {
+            card.closest('.col-12').style.display = 'none';
+        }
+    });
+}
+
+// Close suggestions when clicking outside
+document.addEventListener('click', function(event) {
+    const doctorInput = document.getElementById('doctorSearchInput');
+    const doctorSuggestions = document.getElementById('doctorSuggestions');
+    const hospitalInput = document.getElementById('hospitalSearchInput');
+    const hospitalSuggestions = document.getElementById('hospitalSuggestions');
+
+    if (event.target !== doctorInput && !doctorInput.contains(event.target)) {
+        doctorSuggestions.style.display = 'none';
+    }
+    if (event.target !== hospitalInput && !hospitalInput.contains(event.target)) {
+        hospitalSuggestions.style.display = 'none';
+    }
+});
+</script>
+
+{% endblock %}

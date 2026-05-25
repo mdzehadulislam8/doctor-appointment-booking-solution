@@ -1,0 +1,394 @@
+{% extends 'base.html' %}
+
+{% block title %}Users - DrSeba.com{% endblock %}
+
+{% block content %}
+<div class="container-fluid" style="background-color: #f8f9fa; min-height: 100vh;">
+    <div class="row g-0">
+        <!-- Sidebar -->
+        <div class="col-md-3 col-lg-2 d-none d-md-block" style="background-color: #f8f9fa; border-right: 1px solid #e9ecef;">
+            <div class="p-3">
+                <!-- Logo Section -->
+                <div class="mb-4 pb-3 border-bottom">
+                    <div class="d-flex align-items-center">
+                        <div class="bg-primary rounded d-flex align-items-center justify-content-center me-2" style="width: 40px; height: 40px; font-weight: bold; color: white;">DS</div>
+                        <div>
+                            <h6 class="mb-0 fw-bold">DrSeba.com</h6>
+                            <small class="text-muted">Admin Panel</small>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- User Section -->
+                <div class="mb-4 pb-3 border-bottom">
+                    <div class="d-flex align-items-center">
+                        <div class="bg-light rounded-circle d-flex align-items-center justify-content-center me-2" style="width: 36px; height: 36px;">
+                            <span class="fw-bold text-primary">A</span>
+                        </div>
+                        <div>
+                            <h6 class="mb-0 small fw-bold">Admin User</h6>
+                            <small class="text-muted">Admin</small>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Navigation -->
+                <nav class="nav flex-column gap-1">
+                    <a class="nav-link px-3 py-2 rounded text-dark" href="{% url 'dashboard:admin_dashboard' %}">
+                        <i class="bi bi-speedometer2 me-2"></i>Dashboard
+                    </a>
+                    <a class="nav-link px-3 py-2 rounded text-dark" href="{% url 'dashboard:admin_employees' %}">
+                        <i class="bi bi-people me-2"></i>Employees
+                    </a>
+                    <a class="nav-link px-3 py-2 rounded text-dark" href="{% url 'dashboard:admin_doctors' %}">
+                        <i class="bi bi-heart-pulse me-2"></i>Doctors & Hospitals
+                    </a>
+                    <a class="nav-link px-3 py-2 rounded text-dark" href="{% url 'dashboard:admin_appointments' %}">
+                        <i class="bi bi-calendar-check me-2"></i>Appointments
+                    </a>
+                    <a class="nav-link px-3 py-2 rounded text-dark" href="{% url 'dashboard:admin_payments' %}">
+                        <i class="bi bi-credit-card me-2"></i>Payments
+                    </a>
+                    <a class="nav-link px-3 py-2 rounded text-dark" href="{% url 'dashboard:admin_statistics' %}">
+                        <i class="bi bi-bar-chart-line me-2"></i>Analytics & Reports
+                    </a>
+                </nav>
+                
+                <!-- Logout -->
+                <div class="mt-5 pt-3 border-top">
+                    <a href="{% url 'accounts:logout' %}" class="nav-link px-3 py-2 text-danger">
+                        <i class="bi bi-box-arrow-right me-2"></i>Logout
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="col-md-9 col-lg-10">
+            <div class="p-4">
+                <!-- Header -->
+                <div class="mb-4 d-flex justify-content-between align-items-center">
+                    <div>
+                        <h4 class="fw-bold mb-1">Users</h4>
+                        <p class="text-muted mb-0">Manage all system users</p>
+                    </div>
+                </div>
+                
+                <!-- Users Table -->
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-white border-bottom d-flex justify-content-between align-items-center">
+                        <h5 class="fw-bold mb-0">User List</h5>
+                        <div class="input-group position-relative" style="max-width: 300px;">
+                            <span class="input-group-text bg-white border-end-0">
+                                <i class="bi bi-search"></i>
+                            </span>
+                            <input type="text" class="form-control border-start-0" id="userSearchInput" placeholder="Search users..." oninput="searchUsers()">
+                            <ul class="list-group position-absolute w-100" id="userSuggestions" style="top: 100%; left: 0; z-index: 1000; max-height: 250px; overflow-y: auto; display: none; border: 1px solid #dee2e6; border-top: none;"></ul>
+                        </div>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Name</th>
+                                        <th>Email</th>
+                                        <th>Phone</th>
+                                        <th>Role</th>
+                                        <th>Joined</th>
+                                        <th>Status</th>
+                                        <th width="100">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for user in users %}
+                                    <tr>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <div class="bg-light rounded-circle d-flex align-items-center justify-content-center me-2" style="width: 36px; height: 36px;">
+                                                    <span class="small fw-bold text-primary">{{ user.first_name|slice:":1" }}</span>
+                                                </div>
+                                                <div>
+                                                    <h6 class="mb-0 small fw-bold">{{ user.get_full_name }}</h6>
+                                                    <small class="text-muted">{{ user.username }}</small>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>{{ user.email }}</td>
+                                        <td>{{ user.phone|default:"N/A" }}</td>
+                                        <td>
+                                            {% if user.role == 'admin' %}
+                                            <span class="badge bg-danger">Admin</span>
+                                            {% elif user.role == 'doctor' %}
+                                            <span class="badge bg-primary">Doctor</span>
+                                            {% elif user.role == 'employee' %}
+                                            <span class="badge bg-warning">Employee</span>
+                                            {% else %}
+                                            <span class="badge bg-secondary">{{ user.role|title }}</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>{{ user.date_joined|date:"M d, Y" }}</td>
+                                        <td>
+                                            {% if user.is_active %}
+                                            <span class="badge bg-success">Active</span>
+                                            {% else %}
+                                            <span class="badge bg-secondary">Inactive</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <div class="btn-group btn-group-sm" role="group">
+                                                <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#editUserModal" onclick="editUser({{ user.id }}, '{{ user.first_name }}', '{{ user.last_name }}', '{{ user.email }}', '{{ user.phone }}', '{{ user.role }}')">
+                                                    <i class="bi bi-pencil"></i>
+                                                </button>
+                                                <button class="btn btn-sm btn-outline-danger" onclick="deleteUser({{ user.id }}, '{{ user.get_full_name }}')">
+                                                    <i class="bi bi-trash"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {% empty %}
+                                    <tr>
+                                        <td colspan="7" class="text-center py-4 text-muted">
+                                            <i class="bi bi-inbox fs-3 d-block mb-2"></i>
+                                            No users found
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .table-hover tbody tr:hover {
+        background-color: #f8f9fa;
+    }
+    
+    .bg-light {
+        background-color: #f0f4f8 !important;
+    }
+    
+    .card {
+        border-radius: 8px;
+    }
+    
+    .nav-link {
+        color: #6B7280 !important;
+        transition: all 0.3s ease;
+    }
+    
+    .nav-link:hover {
+        background-color: #f0f4f8 !important;
+    }
+    
+    .nav-link.active {
+        background-color: #0A74DA !important;
+        color: white !important;
+    }
+
+    .suggestion-item {
+        padding: 0.75rem 1rem;
+        cursor: pointer;
+        border-bottom: 1px solid #f0f0f0;
+        transition: background-color 0.2s ease;
+    }
+
+    .suggestion-item:hover {
+        background-color: #f0f0f0;
+    }
+
+    .suggestion-item:last-child {
+        border-bottom: none;
+    }
+</style>
+
+<!-- Edit User Modal -->
+<div class="modal fade" id="editUserModal" tabindex="-1" aria-labelledby="editUserLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title fw-bold" id="editUserLabel">Edit User</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form method="POST" id="editUserForm">
+                {% csrf_token %}
+                <input type="hidden" id="userId" name="user_id">
+                <div class="modal-body">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">First Name</label>
+                            <input type="text" class="form-control" id="editUserFirstName" name="first_name" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Last Name</label>
+                            <input type="text" class="form-control" id="editUserLastName" name="last_name" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Email</label>
+                            <input type="email" class="form-control" id="editUserEmail" name="email" disabled>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Phone</label>
+                            <input type="tel" class="form-control" id="editUserPhone" name="phone">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Role</label>
+                            <select class="form-select" id="editUserRole" name="role" required>
+                                <option value="patient">Patient</option>
+                                <option value="doctor">Doctor</option>
+                                <option value="employee">Employee</option>
+                                <option value="admin">Admin</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer border-0 pt-0">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary fw-bold" onclick="submitEditUser()">
+                        <i class="bi bi-check-lg me-2"></i>Save Changes
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+function editUser(userId, firstName, lastName, email, phone, role) {
+    document.getElementById('userId').value = userId;
+    document.getElementById('editUserFirstName').value = firstName;
+    document.getElementById('editUserLastName').value = lastName;
+    document.getElementById('editUserEmail').value = email;
+    document.getElementById('editUserPhone').value = phone;
+    document.getElementById('editUserRole').value = role;
+}
+
+function submitEditUser() {
+    const userId = document.getElementById('userId').value;
+    const firstName = document.getElementById('editUserFirstName').value;
+    const lastName = document.getElementById('editUserLastName').value;
+    const phone = document.getElementById('editUserPhone').value;
+    const role = document.getElementById('editUserRole').value;
+    
+    fetch(`/dashboard/admin/users/${userId}/update/`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+        },
+        body: `first_name=${firstName}&last_name=${lastName}&phone=${phone}&role=${role}`
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert('User updated successfully');
+            window.location.reload();
+        } else {
+            alert('Error: ' + data.message);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Error updating user');
+    });
+}
+
+function deleteUser(userId, userName) {
+    if (confirm(`Are you sure you want to delete ${userName}?`)) {
+        fetch(`/dashboard/admin/users/${userId}/delete/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('User deleted successfully');
+                window.location.reload();
+            } else {
+                alert('Error: ' + data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Error deleting user');
+        });
+    }
+}
+
+// User Search Function
+function searchUsers() {
+    const input = document.getElementById('userSearchInput');
+    const suggestionsBox = document.getElementById('userSuggestions');
+    const query = input.value.trim();
+
+    if (query.length < 1) {
+        suggestionsBox.style.display = 'none';
+        return;
+    }
+
+    fetch(`/dashboard/admin/users/search/?q=${encodeURIComponent(query)}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.success && data.results.length > 0) {
+                displayUserSuggestions(data.results, suggestionsBox);
+                suggestionsBox.style.display = 'block';
+            } else {
+                suggestionsBox.style.display = 'none';
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching user suggestions:', error);
+            suggestionsBox.style.display = 'none';
+        });
+}
+
+// Display User Suggestions
+function displayUserSuggestions(results, container) {
+    container.innerHTML = '';
+    results.forEach(result => {
+        const item = document.createElement('li');
+        item.className = 'list-group-item suggestion-item';
+        item.textContent = result.display;
+        item.onclick = () => {
+            document.getElementById('userSearchInput').value = result.display;
+            container.style.display = 'none';
+            filterUsersTable(result.display);
+        };
+        container.appendChild(item);
+    });
+}
+
+// Filter Users Table
+function filterUsersTable(searchTerm) {
+    const table = document.querySelector('.table tbody');
+    const rows = table.querySelectorAll('tr');
+    
+    rows.forEach(row => {
+        const text = row.textContent.toLowerCase();
+        if (text.includes(searchTerm.toLowerCase())) {
+            row.style.display = '';
+        } else {
+            row.style.display = 'none';
+        }
+    });
+}
+
+// Close suggestions when clicking outside
+document.addEventListener('click', function(event) {
+    const userInput = document.getElementById('userSearchInput');
+    const userSuggestions = document.getElementById('userSuggestions');
+
+    if (event.target !== userInput && !userInput.contains(event.target)) {
+        userSuggestions.style.display = 'none';
+    }
+});
+</script>
+
+{% endblock %}

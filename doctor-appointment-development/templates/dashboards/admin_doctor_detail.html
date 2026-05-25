@@ -1,0 +1,499 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ doctor.get_full_name }} - Doctor Details{% endblock %}
+
+{% block content %}
+<div class="container-fluid" style="background-color: #f8f9fa; min-height: 100vh;">
+    <div class="row g-0">
+        <!-- Sidebar -->
+        <div class="col-md-3 col-lg-2 d-none d-md-block" style="background-color: #f8f9fa; border-right: 1px solid #e9ecef;">
+            <div class="p-3">
+                <!-- Logo Section -->
+                <div class="mb-4 pb-3 border-bottom">
+                    <div class="d-flex align-items-center">
+                        <div class="bg-primary rounded d-flex align-items-center justify-content-center me-2" style="width: 40px; height: 40px; font-weight: bold; color: white;">DS</div>
+                        <div>
+                            <h6 class="mb-0 fw-bold">DrSeba.com</h6>
+                            <small class="text-muted">Admin Panel</small>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- User Section -->
+                <div class="mb-4 pb-3 border-bottom">
+                    <div class="d-flex align-items-center">
+                        <div class="bg-light rounded-circle d-flex align-items-center justify-content-center me-2" style="width: 36px; height: 36px;">
+                            <span class="fw-bold text-primary">A</span>
+                        </div>
+                        <div>
+                            <h6 class="mb-0 small fw-bold">Admin User</h6>
+                            <small class="text-muted">Admin</small>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Navigation -->
+                <nav class="nav flex-column gap-1">
+                    <a class="nav-link px-3 py-2 rounded text-dark" href="{% url 'dashboard:admin_dashboard' %}">
+                        <i class="bi bi-speedometer2 me-2"></i>Dashboard
+                    </a>
+                    <a class="nav-link px-3 py-2 rounded text-dark" href="{% url 'dashboard:admin_employees' %}">
+                        <i class="bi bi-people me-2"></i>Employees
+                    </a>
+                    <a class="nav-link active px-3 py-2 rounded" href="{% url 'dashboard:admin_doctors' %}" style="background-color: #0A74DA; color: white;">
+                        <i class="bi bi-heart-pulse me-2"></i>Doctors & Hospitals
+                    </a>
+                    <a class="nav-link px-3 py-2 rounded text-dark" href="{% url 'dashboard:admin_appointments' %}">
+                        <i class="bi bi-calendar-check me-2"></i>Appointments
+                    </a>
+                    <a class="nav-link px-3 py-2 rounded text-dark" href="{% url 'dashboard:admin_payments' %}">
+                        <i class="bi bi-credit-card me-2"></i>Payments
+                    </a>
+                    <a class="nav-link px-3 py-2 rounded text-dark" href="{% url 'dashboard:admin_statistics' %}">
+                        <i class="bi bi-bar-chart-line me-2"></i>Analytics & Reports
+                    </a>
+                </nav>
+                
+                <!-- Logout -->
+                <div class="mt-5 pt-3 border-top">
+                    <a href="{% url 'accounts:logout' %}" class="nav-link px-3 py-2 text-danger">
+                        <i class="bi bi-box-arrow-right me-2"></i>Logout
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="col-md-9 col-lg-10">
+            <div class="p-4">
+                <!-- Header -->
+                <div class="mb-4 d-flex justify-content-between align-items-center">
+                    <div>
+                        <a href="{% url 'dashboard:admin_doctors' %}" class="text-muted text-decoration-none small me-2">
+                            <i class="bi bi-arrow-left me-1"></i>Back to Doctors
+                        </a>
+                        <h4 class="fw-bold mb-1 mt-2">Dr. {{ doctor.get_full_name }}</h4>
+                        <small class="text-muted">DOC-{{ doctor.id }}</small>
+                    </div>
+                    <button class="btn btn-primary fw-bold" data-bs-toggle="modal" data-bs-target="#editDoctorModal">
+                        <i class="bi bi-pencil-square me-2"></i>Edit Details
+                    </button>
+                </div>
+                
+                <!-- Doctor Information Card -->
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-header bg-white border-bottom">
+                        <h5 class="fw-bold mb-0">Doctor Information</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-4">
+                            <!-- First Row -->
+                            <div class="col-md-3">
+                                <label class="form-label text-muted small">ID</label>
+                                <p class="mb-0 fw-bold">DOC-{{ doctor.id }}</p>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label text-muted small">Name</label>
+                                <p class="mb-0 fw-bold">Dr. {{ doctor.get_full_name }}</p>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label text-muted small">Age</label>
+                                <p class="mb-0 fw-bold">{{ doctor.user.age|default:"N/A" }}</p>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label text-muted small">Gender</label>
+                                <p class="mb-0 fw-bold">{{ doctor.user.gender|default:"Not specified" }}</p>
+                            </div>
+                            
+                            <!-- Second Row -->
+                            <div class="col-md-3">
+                                <label class="form-label text-muted small">Specialty</label>
+                                <p class="mb-0 fw-bold">
+                                    {% for specialty in doctor.specialties.all %}
+                                        <span class="badge bg-light text-dark">{{ specialty.name }}</span>
+                                    {% empty %}
+                                        <span class="text-muted">N/A</span>
+                                    {% endfor %}
+                                </p>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label text-muted small">Experience (Years)</label>
+                                <p class="mb-0 fw-bold">{{ doctor.experience_years }}</p>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label text-muted small">Registration Date</label>
+                                <p class="mb-0 fw-bold">{{ doctor.created_at|date:"Y-m-d" }}</p>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label text-muted small">Status</label>
+                                <p class="mb-0">
+                                    {% if doctor.is_verified and doctor.is_active %}
+                                        <span class="badge bg-success">Active</span>
+                                    {% else %}
+                                        <span class="badge bg-warning">{{ doctor.is_active|yesno:"Active,Inactive" }}</span>
+                                    {% endif %}
+                                </p>
+                            </div>
+                            
+                            <!-- Third Row -->
+                            <div class="col-md-4">
+                                <label class="form-label text-muted small">Email</label>
+                                <p class="mb-0 fw-bold">{{ doctor.user.email }}</p>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label text-muted small">Phone</label>
+                                <p class="mb-0 fw-bold">
+                                    🇧🇩 +880 {{ doctor.user.phone|default:"N/A" }}
+                                </p>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label text-muted small">BMDC Number</label>
+                                <p class="mb-0 fw-bold">{{ doctor.bmdc_number }}</p>
+                            </div>
+                            
+                            <!-- Fourth Row -->
+                            <div class="col-md-12">
+                                <label class="form-label text-muted small">Qualification</label>
+                                <p class="mb-0 fw-bold">{{ doctor.qualifications|default:"N/A" }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Hospital Schedules Section -->
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-white border-bottom d-flex justify-content-between align-items-center">
+                        <h5 class="fw-bold mb-0">Hospital Schedules</h5>
+                        <button class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#addScheduleModal">
+                            <i class="bi bi-plus-lg me-1"></i>Add Schedule
+                        </button>
+                    </div>
+                    <div class="card-body">
+                        <!-- Hospital Schedules List -->
+                        {% for schedule in hospital_schedules %}
+                        <div class="border rounded p-3 mb-3">
+                            <div class="row align-items-start">
+                                <!-- Hospital Info -->
+                                <div class="col-md-3">
+                                    <label class="form-label text-muted small">Hospital</label>
+                                    <p class="mb-1 fw-bold">{{ schedule.hospital.name }}</p>
+                                    <small class="text-muted">HOS-{{ schedule.hospital.id }}</small>
+                                </div>
+                                
+                                <!-- Days -->
+                                <div class="col-md-2">
+                                    <label class="form-label text-muted small">Days</label>
+                                    <p class="mb-0 fw-bold">
+                                        {% for day in schedule.consultation_days %}
+                                            <span class="badge bg-info">{{ day }}</span>
+                                        {% empty %}
+                                            <span class="text-muted">N/A</span>
+                                        {% endfor %}
+                                    </p>
+                                </div>
+                                
+                                <!-- Time Slot -->
+                                <div class="col-md-2">
+                                    <label class="form-label text-muted small">Time</label>
+                                    <p class="mb-0 fw-bold">
+                                        {% if schedule.morning_start and schedule.morning_end %}
+                                            {{ schedule.morning_start|time:"H:i" }} - {{ schedule.morning_end|time:"H:i" }}
+                                        {% elif schedule.evening_start and schedule.evening_end %}
+                                            {{ schedule.evening_start|time:"H:i" }} - {{ schedule.evening_end|time:"H:i" }}
+                                        {% else %}
+                                            N/A
+                                        {% endif %}
+                                    </p>
+                                </div>
+                                
+                                <!-- Contact Number -->
+                                <div class="col-md-2">
+                                    <label class="form-label text-muted small">Contact Number</label>
+                                    <p class="mb-0 fw-bold">
+                                        🇧🇩 +880 {{ schedule.hospital.phone|slice:"3:" }}
+                                    </p>
+                                </div>
+                                
+                                <!-- Actions -->
+                                <div class="col-md-3 text-end">
+                                    <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#editScheduleModal" 
+                                        onclick="loadScheduleData({{ schedule.id }}, '{{ schedule.consultation_days|join:',' }}', '{{ schedule.morning_start|time:"H:i" }}', '{{ schedule.morning_end|time:"H:i" }}', '{{ schedule.evening_start|time:"H:i" }}', '{{ schedule.evening_end|time:"H:i" }}')">
+                                        <i class="bi bi-pencil me-1"></i>Edit
+                                    </button>
+                                    <button class="btn btn-sm btn-outline-danger" onclick="removeSchedule({{ schedule.id }})">
+                                        <i class="bi bi-trash me-1"></i>Remove
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        {% empty %}
+                        <p class="text-center text-muted py-4">No hospital schedules assigned yet.</p>
+                        {% endfor %}
+                    </div>
+                </div>
+                
+                <!-- Cancel/Save Buttons -->
+                <div class="mt-4 d-flex justify-content-between">
+                    <a href="{% url 'dashboard:admin_doctors' %}" class="btn btn-secondary">
+                        <i class="bi bi-arrow-left me-2"></i>Back to Doctors
+                    </a>
+                    <button class="btn btn-primary fw-bold" data-bs-toggle="modal" data-bs-target="#editDoctorModal">
+                        <i class="bi bi-pencil-square me-2"></i>Edit Doctor Details
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Doctor Modal -->
+<div class="modal fade" id="editDoctorModal" tabindex="-1" aria-labelledby="editDoctorLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title fw-bold" id="editDoctorLabel">Edit Doctor Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form method="POST" id="editDoctorForm">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">First Name</label>
+                            <input type="text" class="form-control" id="doctorFirstName" name="first_name" value="{{ doctor.user.first_name }}" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Last Name</label>
+                            <input type="text" class="form-control" id="doctorLastName" name="last_name" value="{{ doctor.user.last_name }}" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Email</label>
+                            <input type="email" class="form-control" value="{{ doctor.user.email }}" disabled>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Phone</label>
+                            <input type="tel" class="form-control" id="doctorPhone" name="phone" value="{{ doctor.user.phone }}" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">BMDC Number</label>
+                            <input type="text" class="form-control" id="doctorBMDC" name="bmdc_number" value="{{ doctor.bmdc_number }}" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Years of Experience</label>
+                            <input type="number" class="form-control" id="doctorExperience" name="experience_years" value="{{ doctor.experience_years }}" min="0" required>
+                        </div>
+                        <div class="col-md-12">
+                            <label class="form-label fw-bold">Qualifications</label>
+                            <textarea class="form-control" id="doctorQualifications" name="qualifications" rows="2">{{ doctor.qualifications }}</textarea>
+                            <small class="text-muted">Separate multiple qualifications with a pipe (|)</small>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="doctorVerified" name="is_verified" {% if doctor.is_verified %}checked{% endif %}>
+                                <label class="form-check-label fw-bold" for="doctorVerified">Verified</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="doctorActive" name="is_active" {% if doctor.is_active %}checked{% endif %}>
+                                <label class="form-check-label fw-bold" for="doctorActive">Active</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer border-0 pt-0">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary fw-bold" onclick="submitEditDoctor({{ doctor.id }})">
+                        <i class="bi bi-check-lg me-2"></i>Save Changes
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Schedule Modal -->
+<div class="modal fade" id="editScheduleModal" tabindex="-1" aria-labelledby="editScheduleLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title fw-bold" id="editScheduleLabel">Edit Hospital Schedule</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form method="POST" id="editScheduleForm">
+                {% csrf_token %}
+                <input type="hidden" id="scheduleId" name="schedule_id">
+                <div class="modal-body">
+                    <div class="row g-3">
+                        <div class="col-md-12">
+                            <label class="form-label fw-bold">Consultation Days</label>
+                            <input type="text" class="form-control" id="consultationDays" name="consultation_days" placeholder="e.g., Sun, Tue, Thu" required>
+                            <small class="text-muted">Separate days with commas</small>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Morning Start Time</label>
+                            <input type="time" class="form-control" id="morningStart" name="morning_start">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Morning End Time</label>
+                            <input type="time" class="form-control" id="morningEnd" name="morning_end">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Evening Start Time</label>
+                            <input type="time" class="form-control" id="eveningStart" name="evening_start">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Evening End Time</label>
+                            <input type="time" class="form-control" id="eveningEnd" name="evening_end">
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer border-0 pt-0">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary fw-bold" onclick="submitEditSchedule({{ doctor.id }})">
+                        <i class="bi bi-check-lg me-2"></i>Save Changes
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Add Schedule Modal -->
+<div class="modal fade" id="addScheduleModal" tabindex="-1" aria-labelledby="addScheduleLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title fw-bold" id="addScheduleLabel">Add Hospital Schedule</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p class="text-muted">Coming soon...</p>
+            </div>
+            <div class="modal-footer border-0 pt-0">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .card {
+        border-radius: 8px;
+    }
+    
+    .nav-link {
+        color: #6B7280 !important;
+        transition: all 0.3s ease;
+    }
+    
+    .nav-link:hover {
+        background-color: #f0f4f8 !important;
+    }
+    
+    .nav-link.active {
+        background-color: #0A74DA !important;
+        color: white !important;
+    }
+    
+    .form-label {
+        font-weight: 600;
+        color: #374151;
+    }
+</style>
+
+<script>
+function submitEditDoctor(doctorId) {
+    const form = document.getElementById('editDoctorForm');
+    const formData = new FormData(form);
+    
+    fetch(`/dashboard/admin/doctors/${doctorId}/update/`, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+        },
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert('Doctor updated successfully');
+            location.reload();
+        } else {
+            alert('Error: ' + data.message);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Error updating doctor');
+    });
+    
+    return false;
+}
+
+function loadScheduleData(scheduleId, days, morningStart, morningEnd, eveningStart, eveningEnd) {
+    document.getElementById('scheduleId').value = scheduleId;
+    document.getElementById('consultationDays').value = days;
+    document.getElementById('morningStart').value = morningStart;
+    document.getElementById('morningEnd').value = morningEnd;
+    document.getElementById('eveningStart').value = eveningStart;
+    document.getElementById('eveningEnd').value = eveningEnd;
+}
+
+function submitEditSchedule(doctorId) {
+    const scheduleId = document.getElementById('scheduleId').value;
+    const form = document.getElementById('editScheduleForm');
+    const formData = new FormData(form);
+    
+    fetch(`/dashboard/admin/doctors/${doctorId}/schedule/${scheduleId}/update/`, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+        },
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert('Schedule updated successfully');
+            location.reload();
+        } else {
+            alert('Error: ' + data.message);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Error updating schedule');
+    });
+    
+    return false;
+}
+
+function removeSchedule(scheduleId) {
+    if (confirm('Are you sure you want to remove this hospital schedule?')) {
+        const doctorId = {{ doctor.id }};
+        
+        fetch(`/dashboard/admin/doctors/${doctorId}/schedule/${scheduleId}/remove/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('Hospital removed successfully');
+                location.reload();
+            } else {
+                alert('Error: ' + data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Error removing hospital');
+        });
+    }
+}
+</script>
+
+{% endblock %}

@@ -1,0 +1,300 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ doctor.get_full_name }} - DrSeba.com{% endblock %}
+
+{% block content %}
+<!-- Doctor Profile Header -->
+<div class="container py-5">
+    <div class="row">
+        <!-- Main Profile Section -->
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body p-4">
+                    <div class="row align-items-start">
+                        <!-- Doctor Image -->
+                        <div class="col-auto">
+                            {% if doctor.profile_picture %}
+                            <img src="{{ doctor.profile_picture.url }}" alt="{{ doctor.user.get_full_name }}" style="width: 120px; height: 120px; object-fit: cover; border-radius: 8px;">
+                            {% else %}
+                            <div class="bg-primary bg-opacity-10 d-flex align-items-center justify-content-center" style="width: 120px; height: 120px; border-radius: 8px;">
+                                <i class="bi bi-person fs-1 text-primary"></i>
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Doctor Info -->
+                        <div class="col">
+                            <div class="row">
+                                <div class="col-md-8">
+                                    <h4 class="fw-bold mb-1">
+                                        Dr. {{ doctor.user.get_full_name|default:doctor.user.username }}
+                                        {% if doctor.is_verified %}
+                                        <i class="bi bi-check-circle-fill text-success" style="font-size: 0.9rem;"></i>
+                                        {% endif %}
+                                    </h4>
+                                    <p class="text-muted mb-2">
+                                        {% for spec in doctor.specialties.all|slice:":1" %}
+                                        {{ spec.name }}
+                                        {% endfor %}
+                                    </p>
+
+                                    <!-- Rating -->
+                                    <div class="mb-2">
+                                        <span class="fw-bold">{{ doctor.rating|default:"0.0" }}</span>
+                                        <span style="color: #ffc107;">
+                                            {% for i in "12345"|make_list %}
+                                                {% if forloop.counter <= doctor.rating %}
+                                                <i class="bi bi-star-fill"></i>
+                                                {% else %}
+                                                <i class="bi bi-star"></i>
+                                                {% endif %}
+                                            {% endfor %}
+                                        </span>
+                                        <span class="text-muted">({{ doctor.total_reviews }} reviews)</span>
+                                    </div>
+
+                                    <!-- Experience -->
+                                    <p class="mb-1 text-muted"><i class="bi bi-briefcase me-2"></i>{{ doctor.experience_years }} years of experience</p>
+
+                                    <!-- Languages -->
+                                    <p class="mb-1 text-muted"><i class="bi bi-globe me-2"></i>Languages: Bengali, English</p>
+
+                                    <!-- Location & Time -->
+                                    <p class="mb-1 text-muted"><i class="bi bi-geo-alt me-2"></i>Dhaka</p>
+                                    <p class="mb-2 text-muted"><i class="bi bi-clock me-2"></i>Sun-Thu, 5:00 PM - 8:00 PM</p>
+
+                                    <!-- Online Available Badge -->
+                                    <div>
+                                        <span class="badge bg-success">✓ Online Available</span>
+                                    </div>
+                                </div>
+
+                                <!-- Consultation Fee -->
+                                <div class="col-md-4 text-end">
+                                    <div class="text-muted small mb-1">Consultation Fee</div>
+                                    <div class="fw-bold text-primary" style="font-size: 1.5rem;">৳{{ doctor.consultation_fee_in_person }}</div>
+                                </div>
+                            </div>
+
+                            <!-- Action Buttons -->
+                            <div class="mt-3">
+                                <div class="d-grid gap-2 d-sm-flex">
+                                    <a href="{% url 'appointments:book_doctor' doctor.id %}" class="btn btn-primary">
+                                        Book Appointment
+                                    </a>
+                                    <button class="btn btn-outline-primary">
+                                        <i class="bi bi-cpu me-1"></i>Ask AI
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- About Section -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body">
+                    <h5 class="fw-bold mb-3">About</h5>
+                    <p class="text-muted">{% if doctor.about %}{{ doctor.about }}{% else %}Dr. {{ doctor.user.first_name }} {{ doctor.user.last_name }} is a highly experienced {% if doctor.specialties.first %}{{ doctor.specialties.first.name }}{% else %}General Physician{% endif %} with 15 years of practice. Known for providing compassionate care and accurate diagnosis.{% endif %}</p>
+                </div>
+            </div>
+
+            <!-- Qualifications Section -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body">
+                    <h5 class="fw-bold mb-3">Qualifications</h5>
+                    <div class="row g-3">
+                        {% for line in qualifications_list %}
+                        <div class="col-12">
+                            <div class="d-flex align-items-center">
+                                <i class="bi bi-check-circle text-success me-2"></i>
+                                <small>{{ line }}</small>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% if doctor.bmdc_number %}
+                    <div class="mt-3 p-3" style="background-color: #f8f9fa; border-radius: 6px;">
+                        <small class="text-muted">BMDC Registration:</small>
+                        <div class="fw-bold">{{ doctor.bmdc_number }}</div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Chambers & Visiting Hours -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body">
+                    <h5 class="fw-bold mb-3">Chambers & Visiting Hours</h5>
+                    {% for hospital in hospitals %}
+                    <div class="mb-3 pb-3 {% if not forloop.last %}border-bottom{% endif %}">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <h6 class="fw-bold mb-1">{{ hospital.name }}</h6>
+                                <p class="text-muted mb-1 small">
+                                    <i class="bi bi-geo-alt me-1"></i>
+                                    {{ hospital.address|default:"Address not available" }}
+                                </p>
+                                <p class="text-muted small">
+                                    <i class="bi bi-clock me-1"></i>
+                                    Sun-Thu, 5:00 PM - 8:00 PM
+                                </p>
+                            </div>
+                            <i class="bi bi-map text-primary"></i>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <p class="text-muted">No hospital information available.</p>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Patient Reviews Section -->
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <h5 class="fw-bold mb-3">Patient Reviews ({{ doctor.total_reviews }})</h5>
+
+                    <!-- Rating Summary with Bars -->
+                    <div class="row mb-4">
+                        <div class="col-md-4">
+                            <div class="text-center">
+                                <div class="display-3 fw-bold text-dark">{{ doctor.rating|default:"0.0" }}</div>
+                                <div style="color: #ffc107; font-size: 1.2rem;">
+                                    {% for i in "12345"|make_list %}
+                                        {% if forloop.counter <= doctor.rating %}
+                                        <i class="bi bi-star-fill"></i>
+                                        {% else %}
+                                        <i class="bi bi-star"></i>
+                                        {% endif %}
+                                    {% endfor %}
+                                </div>
+                                <small class="text-muted">{{ doctor.total_reviews }} Reviews</small>
+                            </div>
+                        </div>
+                        <div class="col-md-8">
+                            <div class="d-flex align-items-center mb-2">
+                                <small style="width: 60px;">5★</small>
+                                <div class="progress flex-grow-1 me-2" style="height: 8px;">
+                                    <div class="progress-bar bg-warning" style="width: 80%;"></div>
+                                </div>
+                                <small class="text-muted">80%</small>
+                            </div>
+                            <div class="d-flex align-items-center mb-2">
+                                <small style="width: 60px;">4★</small>
+                                <div class="progress flex-grow-1 me-2" style="height: 8px;">
+                                    <div class="progress-bar bg-warning" style="width: 15%;"></div>
+                                </div>
+                                <small class="text-muted">15%</small>
+                            </div>
+                            <div class="d-flex align-items-center mb-2">
+                                <small style="width: 60px;">3★</small>
+                                <div class="progress flex-grow-1 me-2" style="height: 8px;">
+                                    <div class="progress-bar bg-warning" style="width: 3%;"></div>
+                                </div>
+                                <small class="text-muted">3%</small>
+                            </div>
+                            <div class="d-flex align-items-center mb-2">
+                                <small style="width: 60px;">2★</small>
+                                <div class="progress flex-grow-1 me-2" style="height: 8px;">
+                                    <div class="progress-bar bg-warning" style="width: 1%;"></div>
+                                </div>
+                                <small class="text-muted">1%</small>
+                            </div>
+                            <div class="d-flex align-items-center">
+                                <small style="width: 60px;">1★</small>
+                                <div class="progress flex-grow-1 me-2" style="height: 8px;">
+                                    <div class="progress-bar bg-warning" style="width: 1%;"></div>
+                                </div>
+                                <small class="text-muted">1%</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Individual Reviews -->
+                    {% for review in reviews %}
+                    <div class="border-bottom pb-3 mb-3 {% if forloop.last %}border-0 mb-0{% endif %}">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <div>
+                                <h6 class="fw-bold mb-1">{{ review.patient.get_full_name|default:review.patient.username }}</h6>
+                                <small class="text-muted">{{ review.created_at|date:"m/d/Y" }}</small>
+                            </div>
+                            <div style="color: #ffc107;">
+                                {% for i in "12345"|make_list %}
+                                    {% if forloop.counter <= review.rating %}
+                                    <i class="bi bi-star-fill"></i>
+                                    {% else %}
+                                    <i class="bi bi-star"></i>
+                                    {% endif %}
+                                {% endfor %}
+                            </div>
+                        </div>
+                        <p class="text-muted small mb-0">{{ review.comment|default:"Great doctor! Very patient and thorough in explaining everything." }}</p>
+                    </div>
+                    {% empty %}
+                    <p class="text-muted">No reviews yet.</p>
+                    {% endfor %}
+
+                    <!-- View All Reviews Button -->
+                    <div class="text-center mt-3">
+                        <button class="btn btn-outline-primary w-100">View All Reviews</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Sidebar -->
+        <div class="col-lg-4">
+            <!-- Quick Actions -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body">
+                    <h6 class="fw-bold mb-3">Quick Actions</h6>
+                    <div class="d-grid gap-2">
+                        <a href="{% url 'appointments:book_doctor' doctor.id %}" class="btn btn-primary">
+                            Book Appointment
+                        </a>
+                        <button class="btn btn-success">
+                            <i class="bi bi-camera-video me-1"></i>Online Consultation
+                        </button>
+                        <button class="btn btn-outline-secondary">
+                            <i class="bi bi-heart me-1"></i>Save Doctor
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Emergency Section -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body">
+                    <h6 class="fw-bold text-danger mb-3">Emergency?</h6>
+                    <p class="text-muted small mb-3">For medical emergencies, call immediately</p>
+                    <button class="btn btn-danger w-100">
+                        <i class="bi bi-telephone me-1"></i>Call 999
+                    </button>
+                </div>
+            </div>
+
+            <!-- Share Profile -->
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <h6 class="fw-bold mb-3">Share Profile</h6>
+                    <p class="text-muted small mb-3">Recommend this doctor to friends and family</p>
+                    <div class="d-grid gap-2">
+                        <button class="btn btn-outline-primary">
+                            <i class="bi bi-facebook me-1"></i>Facebook
+                        </button>
+                        <button class="btn btn-outline-success">
+                            <i class="bi bi-whatsapp me-1"></i>WhatsApp
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .bi-star-fill { color: #ffc107; }
+    .verify-badge { color: #28a745; }
+</style>
+{% endblock %}

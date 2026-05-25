@@ -1,0 +1,102 @@
+{% extends 'base.html' %}
+
+{% block title %}Payment - DrSeba.com{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="fw-bold mb-0">Complete Payment</h5>
+                </div>
+                <div class="card-body p-4">
+                    <!-- Appointment Summary -->
+                    <div class="bg-light p-3 rounded mb-4">
+                        <h6 class="fw-bold mb-3">Appointment Summary</h6>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="text-muted">Doctor</span>
+                            <span class="fw-bold">{{ appointment.doctor.get_full_name }}</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="text-muted">Date</span>
+                            <span>{{ appointment.date|date:"M d, Y" }}</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="text-muted">Time</span>
+                            <span>{{ appointment.time_slot }}</span>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <span class="text-muted">Type</span>
+                            <span>{{ appointment.get_consultation_type_display }}</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Fee Breakdown -->
+                    <div class="mb-4">
+                        <h6 class="fw-bold mb-3">Fee Breakdown</h6>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="text-muted">Consultation Fee</span>
+                            <span>৳ {{ appointment.consultation_fee }}</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="text-muted">Service Fee</span>
+                            <span>৳ {{ appointment.service_fee }}</span>
+                        </div>
+                        <hr>
+                        <div class="d-flex justify-content-between">
+                            <span class="fw-bold">Total Amount</span>
+                            <span class="fw-bold text-primary fs-5">৳ {{ appointment.total_amount }}</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Payment Methods -->
+                    <form method="POST">
+                        {% csrf_token %}
+                        
+                        <h6 class="fw-bold mb-3">Select Payment Method</h6>
+                        
+                        <div class="d-grid gap-2 mb-4">
+                            <div class="form-check border p-3 rounded">
+                                <input class="form-check-input" type="radio" name="payment_method" value="bkash" id="bkash" required>
+                                <label class="form-check-label d-flex align-items-center" for="bkash">
+                                    <span class="bg-danger text-white px-2 py-1 rounded me-2" style="font-size: 12px;">bKash</span>
+                                    <span>Pay with bKash</span>
+                                </label>
+                            </div>
+                            
+                            <div class="form-check border p-3 rounded">
+                                <input class="form-check-input" type="radio" name="payment_method" value="nagad" id="nagad">
+                                <label class="form-check-label d-flex align-items-center" for="nagad">
+                                    <span class="bg-warning text-dark px-2 py-1 rounded me-2" style="font-size: 12px;">Nagad</span>
+                                    <span>Pay with Nagad</span>
+                                </label>
+                            </div>
+                            
+                            <div class="form-check border p-3 rounded">
+                                <input class="form-check-input" type="radio" name="payment_method" value="card" id="card">
+                                <label class="form-check-label d-flex align-items-center" for="card">
+                                    <i class="bi bi-credit-card me-2"></i>
+                                    <span>Credit/Debit Card</span>
+                                </label>
+                            </div>
+                            
+                            <div class="form-check border p-3 rounded">
+                                <input class="form-check-input" type="radio" name="payment_method" value="cash" id="cash">
+                                <label class="form-check-label d-flex align-items-center" for="cash">
+                                    <i class="bi bi-cash me-2"></i>
+                                    <span>Cash on Arrival</span>
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary w-100 py-2">
+                            <i class="bi bi-lock me-2"></i>Pay ৳ {{ appointment.total_amount }}
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

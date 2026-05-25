@@ -1,0 +1,120 @@
+{% extends 'base.html' %}
+
+{% block title %}Invoice {{ invoice.invoice_number }} - DrSeba.com{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                    <h5 class="fw-bold mb-0">Invoice</h5>
+                    <div>
+                        <a href="{% url 'payments:download_invoice' invoice.id %}" class="btn btn-sm btn-outline-primary">
+                            <i class="bi bi-download me-1"></i>Download
+                        </a>
+                    </div>
+                </div>
+                <div class="card-body p-4">
+                    <!-- Invoice Header -->
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <h4 class="fw-bold text-primary">DrSeba.com</h4>
+                            <p class="text-muted mb-0">Dhaka, Bangladesh</p>
+                            <p class="text-muted mb-0">info@drseba.com</p>
+                        </div>
+                        <div class="col-md-6 text-md-end">
+                            <h5 class="fw-bold">{{ invoice.invoice_number }}</h5>
+                            <p class="text-muted mb-0">Date: {{ invoice.created_at|date:"M d, Y" }}</p>
+                            <p class="text-muted mb-0">Status: <span class="badge bg-success">Paid</span></p>
+                        </div>
+                    </div>
+                    
+                    <!-- Bill To -->
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <h6 class="fw-bold">Bill To:</h6>
+                            <p class="mb-0">{{ appointment.patient.get_full_name }}</p>
+                            <p class="text-muted mb-0">{{ appointment.patient.email }}</p>
+                            <p class="text-muted mb-0">{{ appointment.patient.phone|default:"" }}</p>
+                        </div>
+                        <div class="col-md-6 text-md-end">
+                            <h6 class="fw-bold">Doctor:</h6>
+                            <p class="mb-0">{{ appointment.doctor.get_full_name }}</p>
+                            <p class="text-muted mb-0">{{ appointment.hospital.name }}</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Invoice Items -->
+                    <table class="table table-bordered">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Description</th>
+                                <th class="text-end">Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <strong>Consultation Fee</strong><br>
+                                    <small class="text-muted">{{ appointment.get_consultation_type_display }} consultation</small>
+                                </td>
+                                <td class="text-end">৳ {{ invoice.consultation_fee }}</td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <strong>Service Fee</strong><br>
+                                    <small class="text-muted">Platform service charge</small>
+                                </td>
+                                <td class="text-end">৳ {{ invoice.service_fee }}</td>
+                            </tr>
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <th class="text-end">Subtotal:</th>
+                                <th class="text-end">৳ {{ invoice.consultation_fee|add:invoice.service_fee }}</th>
+                            </tr>
+                            {% if invoice.discount > 0 %}
+                            <tr>
+                                <th class="text-end">Discount:</th>
+                                <th class="text-end text-success">-৳ {{ invoice.discount }}</th>
+                            </tr>
+                            {% endif %}
+                            {% if invoice.tax > 0 %}
+                            <tr>
+                                <th class="text-end">Tax:</th>
+                                <th class="text-end">৳ {{ invoice.tax }}</th>
+                            </tr>
+                            {% endif %}
+                            <tr class="table-primary">
+                                <th class="text-end">Total:</th>
+                                <th class="text-end fs-5">৳ {{ invoice.total_amount }}</th>
+                            </tr>
+                        </tfoot>
+                    </table>
+                    
+                    <!-- Payment Info -->
+                    <div class="bg-light p-3 rounded">
+                        <h6 class="fw-bold mb-2">Payment Information</h6>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p class="mb-1"><strong>Method:</strong> {{ invoice.get_payment_method_display|default:invoice.payment_method }}</p>
+                                <p class="mb-0"><strong>Transaction ID:</strong> {{ invoice.transaction_id|default:"N/A" }}</p>
+                            </div>
+                            <div class="col-md-6 text-md-end">
+                                <p class="mb-1"><strong>Paid On:</strong> {{ invoice.paid_at|date:"M d, Y H:i"|default:"Pending" }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Footer -->
+                    <div class="text-center mt-4">
+                        <p class="text-muted mb-0">Thank you for using DrSeba.com!</p>
+                        <p class="text-muted small">For any queries, contact us at support@drseba.com</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

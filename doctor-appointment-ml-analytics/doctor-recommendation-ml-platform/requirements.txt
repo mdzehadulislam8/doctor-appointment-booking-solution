@@ -1,0 +1,7 @@
+catboost>=1.2.0
+Flask>=3.0.0
+Django>=5.0.0
+numpy>=1.26.0
+openpyxl>=3.1.0
+pandas>=2.2.0
+scikit-learn>=1.4.0

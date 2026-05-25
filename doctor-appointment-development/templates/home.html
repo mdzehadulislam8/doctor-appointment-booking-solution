@@ -1,0 +1,863 @@
+{% extends 'base.html' %}
+
+{% block title %}DrSeba.com - Find Your Trusted Doctor{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-section">
+    <div class="container">
+        <div class="row justify-content-center text-center">
+            <div class="col-lg-8">
+                <h1 class="display-4 fw-bold mb-3">
+                    {{ translations.find_your }} <span class="text-primary">{{ translations.trusted }}</span> {{ translations.doctor }}
+                </h1>
+                <p class="lead text-muted mb-5">{{ translations.hero_subtitle }}</p>
+                
+                <!-- Search Box -->
+                <div class="search-box mb-5">
+                    <form action="/doctors/search/" method="GET" class="row g-2 align-items-center" id="homeSearchForm">
+                        <div class="col-md-7">
+                            <div class="input-group position-relative">
+                                <span class="input-group-text bg-white border-0">
+                                    <i class="bi bi-search text-muted"></i>
+                                </span>
+                                <input type="text" 
+                                       id="homeSearchInput" 
+                                       name="q" 
+                                       class="form-control border-0" 
+                                       placeholder="{{ translations.search_placeholder }}"
+                                       autocomplete="off">
+                                <!-- Auto-Suggest Dropdown -->
+                                <div id="homeSuggestionsDropdown" class="suggestions-dropdown" style="display: none;">
+                                    <div class="suggestions-list"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <select name="district" class="form-select border-0">
+                                <option value="">{{ translations.all_districts }}</option>
+                                <option value="dhaka">Dhaka</option>
+                                <option value="chittagong">Chittagong</option>
+                                <option value="rajshahi">Rajshahi</option>
+                                <option value="khulna">Khulna</option>
+                                <option value="barisal">Barisal</option>
+                                <option value="sylhet">Sylhet</option>
+                                <option value="rangpur">Rangpur</option>
+                                <option value="mymensingh">Mymensingh</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <button type="submit" class="btn btn-primary w-100 rounded-pill home-search-btn">
+                                <i class="bi bi-search me-1"></i><span>{{ translations.search }}</span>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Services -->
+        <div class="row g-4">
+            <div class="col-md-3 col-6">
+                <a href="/doctors/" class="text-decoration-none">
+                    <div class="service-card">
+                        <div class="service-icon bg-primary bg-opacity-10 text-primary">
+                            <i class="bi bi-stethoscope"></i>
+                        </div>
+                        <h6 class="fw-bold">{{ translations.doctor_search }}</h6>
+                        <small class="text-muted">{{ translations.find_specialist }}</small>
+                    </div>
+                </a>
+            </div>
+            <div class="col-md-3 col-6">
+                <button type="button" class="text-decoration-none border-0 bg-transparent w-100" data-bs-toggle="modal" data-bs-target="#diagnosticModal" style="cursor: pointer;">
+                    <div class="service-card">
+                        <div class="service-icon bg-success bg-opacity-10 text-success">
+                            <i class="bi bi-flask-vial"></i>
+                        </div>
+                        <h6 class="fw-bold">{{ translations.diagnostic }}</h6>
+                        <small class="text-muted">{{ translations.book_lab_tests }}</small>
+                    </div>
+                </button>
+            </div>
+            <div class="col-md-3 col-6">
+                <button type="button" class="text-decoration-none border-0 bg-transparent w-100" data-bs-toggle="modal" data-bs-target="#ambulanceModal" style="cursor: pointer;">
+                    <div class="service-card">
+                        <div class="service-icon bg-danger bg-opacity-10 text-danger">
+                            <i class="bi bi-truck-front"></i>
+                        </div>
+                        <h6 class="fw-bold">{{ translations.ambulance }}</h6>
+                        <small class="text-muted">{{ translations.emergency_transport }}</small>
+                    </div>
+                </button>
+            </div>
+            <div class="col-md-3 col-6">
+                <button type="button" class="text-decoration-none border-0 bg-transparent w-100" data-bs-toggle="modal" data-bs-target="#icuModal" style="cursor: pointer;">
+                    <div class="service-card">
+                        <div class="service-icon bg-info bg-opacity-10 text-info">
+                            <i class="bi bi-hospital"></i>
+                        </div>
+                        <h6 class="fw-bold">{{ translations.icu_nicu }}</h6>
+                        <small class="text-muted">{{ translations.bed_availability }}</small>
+                    </div>
+                </button>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Stats Section -->
+<section class="py-5">
+    <div class="container">
+        <div class="row g-4 text-center">
+            <div class="col-md-4">
+                <div class="stat-card">
+                    <h2 class="display-5 fw-bold text-primary">15,000+</h2>
+                    <p class="text-muted mb-0">{{ translations.verified_doctors }}</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="stat-card">
+                    <h2 class="display-5 fw-bold text-success">500+</h2>
+                    <p class="text-muted mb-0">{{ translations.partner_hospitals }}</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="stat-card">
+                    <h2 class="display-5 fw-bold text-primary">100,000+</h2>
+                    <p class="text-muted mb-0">{{ translations.happy_patients }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Popular Specialties -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2 class="fw-bold">{{ translations.popular_specialties }}</h2>
+            <p class="text-muted">{{ translations.find_by_specialty }}</p>
+        </div>
+        
+        {% if featured_specialties %}
+        <div class="row g-4">
+            {% for specialty in featured_specialties %}
+            <!-- Dynamic Specialty Card -->
+            <div class="col-lg-3 col-md-4 col-6">
+                <a href="/doctors/specialty/{{ specialty.name|lower|cut:' '|cut:'&'|cut:'/' }}/" class="text-decoration-none">
+                    <div class="specialty-card">
+                        <div class="fs-1 mb-2">{{ specialty.emoji|default:"⚕️" }}</div>
+                        <h6 class="fw-bold text-dark">{{ specialty.name }}</h6>
+                        <small class="text-muted">{{ specialty.description|default:"Medical specialists" }}</small>
+                    </div>
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- View All Specialties Button (Only show if more than 8) -->
+        <div class="text-center mt-5">
+            {% if show_see_all %}
+            <a href="/doctors/specialties/" class="btn btn-primary btn-lg">
+                See All {{ total_specialties_with_doctors }} Specialties <i class="bi bi-arrow-right ms-1"></i>
+            </a>
+            {% else %}
+            <a href="/doctors/specialties/" class="btn btn-primary btn-lg">
+                {{ translations.view_all_specialties }} <i class="bi bi-arrow-right ms-1"></i>
+            </a>
+            {% endif %}
+        </div>
+        {% else %}
+        <!-- No specialties with doctors yet -->
+        <div class="alert alert-info text-center" role="alert">
+            <i class="bi bi-info-circle me-2"></i>
+            <strong>No specialties available yet.</strong><br>
+            <small>Admin needs to add doctors with specialties to display them here.</small>
+        </div>
+        <div class="text-center mt-3">
+            <a href="/doctors/" class="btn btn-primary">Browse All Doctors</a>
+        </div>
+        {% endif %}
+    </div>
+</section>
+
+<!-- Featured Doctors Section -->
+<section class="py-5">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center mb-5">
+            <div>
+                <h2 class="fw-bold">{{ translations.featured_doctors }}</h2>
+                <p class="text-muted mb-0">{{ translations.top_rated_doctors }}</p>
+            </div>
+            <a href="/doctors/" class="btn btn-outline-primary">
+                {{ translations.view_all }} <i class="bi bi-arrow-right ms-1"></i>
+            </a>
+        </div>
+        
+        {% if featured_doctors %}
+        <div class="row g-4">
+            {% for doctor in featured_doctors %}
+            <!-- Dynamic Doctor Card -->
+            <div class="col-lg-4 col-md-6">
+                <div class="doctor-card p-4">
+                    <div class="d-flex align-items-start mb-3">
+                        {% if doctor.profile_image %}
+                            <img src="{{ doctor.profile_image.url }}" class="doctor-img me-3" alt="Dr. {{ doctor.first_name }} {{ doctor.last_name }}">
+                        {% else %}
+                            <img src="https://via.placeholder.com/60?text={{ doctor.first_name|first }}" class="doctor-img me-3" alt="Dr. {{ doctor.first_name }} {{ doctor.last_name }}">
+                        {% endif %}
+                        <div class="flex-grow-1">
+                            <h6 class="fw-bold mb-1">Dr. {{ doctor.first_name }} {{ doctor.last_name }}</h6>
+                            {% if doctor.specialties.all %}
+                                <small class="text-muted">{{ doctor.specialties.all|first }}</small>
+                            {% else %}
+                                <small class="text-muted">Medical Professional</small>
+                            {% endif %}
+                            {% if doctor.experience_years %}
+                                <div class="mt-1">
+                                    <small class="text-muted">{{ doctor.experience_years }} {{ translations.years_exp }}</small>
+                                </div>
+                            {% endif %}
+                        </div>
+                        {% if doctor.is_verified %}
+                            <i class="bi bi-check-circle-fill verified-badge ms-auto"></i>
+                        {% endif %}
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <div class="rating">
+                            <i class="bi bi-star-fill"></i>
+                            <span class="text-dark ms-1">{{ doctor.average_rating|default:"4.5" }}</span>
+                            <small class="text-muted">({{ doctor.review_count|default:"0" }})</small>
+                        </div>
+                        <div class="text-end">
+                            <small class="text-muted">{{ translations.consultation }}</small>
+                            <p class="fw-bold text-primary mb-0">৳ {{ doctor.consultation_fee|default:"500" }}</p>
+                        </div>
+                    </div>
+                    <div class="d-grid gap-2 d-md-flex">
+                        <a href="/doctors/" class="btn btn-outline-primary flex-fill">{{ translations.view_profile }}</a>
+                        <a href="/doctors/" class="btn btn-primary flex-fill">{{ translations.book_now }}</a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <!-- No doctors available -->
+        <div class="alert alert-info text-center" role="alert">
+            <i class="bi bi-info-circle me-2"></i>
+            <strong>No doctors available yet.</strong><br>
+            <small>Admin needs to add doctors to display them here.</small>
+        </div>
+        <div class="text-center mt-3">
+            <a href="/doctors/" class="btn btn-primary">Browse All Doctors</a>
+        </div>
+        {% endif %}
+    </div>
+</section>
+
+<!-- Partner Hospitals -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2 class="fw-bold">{{ translations.partner_hospitals_title }}</h2>
+        </div>
+        
+        {% if partner_hospitals %}
+        <div class="row g-4 justify-content-center">
+            {% for hospital in partner_hospitals %}
+            <!-- Dynamic Hospital Card -->
+            <div class="col-md-3 col-6">
+                <div class="bg-white p-4 rounded shadow-sm text-center">
+                    {% if hospital.logo %}
+                        <img src="{{ hospital.logo.url }}" class="img-fluid" alt="{{ hospital.name }}" style="filter: grayscale(100%); max-height: 80px;">
+                    {% else %}
+                        <div style="height: 80px; display: flex; align-items: center; justify-content: center; color: #999;">
+                            <p class="mb-0">{{ hospital.name }}</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <!-- No hospitals yet -->
+        <div class="alert alert-info text-center" role="alert">
+            <i class="bi bi-info-circle me-2"></i>
+            <strong>No partner hospitals available yet.</strong><br>
+            <small>Partner hospital logos will appear here after admin adds them.</small>
+        </div>
+        {% endif %}
+    </div>
+</section>
+
+<!-- Testimonials -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2 class="fw-bold">{{ translations.what_patients_say }}</h2>
+        </div>
+        
+        {% if featured_reviews %}
+        <div class="row g-4">
+            {% for review in featured_reviews %}
+            <!-- Dynamic Testimonial Card -->
+            <div class="col-md-4">
+                <div class="testimonial-card">
+                    <div class="rating mb-3">
+                        {% for i in "12345" %}
+                            {% if forloop.counter <= review.rating %}
+                                <i class="bi bi-star-fill"></i>
+                            {% else %}
+                                <i class="bi bi-star"></i>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                    <p class="text-muted">"{{ review.comment }}"</p>
+                    <div class="d-flex align-items-center mt-3">
+                        {% if review.patient.profile_image %}
+                            <img src="{{ review.patient.profile_image.url }}" class="rounded-circle me-3" width="40" height="40" alt="Patient">
+                        {% else %}
+                            <img src="https://via.placeholder.com/40?text={{ review.patient.first_name|first }}" class="rounded-circle me-3" width="40" height="40" alt="Patient">
+                        {% endif %}
+                        <div>
+                            <h6 class="mb-0 fw-bold">{{ review.patient.first_name }} {{ review.patient.last_name }}</h6>
+                            <small class="text-muted">Patient</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <!-- No reviews yet -->
+        <div class="alert alert-info text-center" role="alert">
+            <i class="bi bi-info-circle me-2"></i>
+            <strong>No reviews available yet.</strong><br>
+            <small>Patient reviews will appear here after they complete appointments and leave feedback.</small>
+        </div>
+        {% endif %}
+    </div>
+</section>
+
+<style>
+    .service-card {
+        padding: 20px;
+        border-radius: 12px;
+        text-align: center;
+        background: white;
+        transition: all 0.3s ease;
+        cursor: pointer;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    }
+
+    a .service-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+    }
+
+    .service-icon {
+        width: 60px;
+        height: 60px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.8rem;
+        margin: 0 auto 12px;
+        transition: all 0.3s ease;
+    }
+
+    a .service-card:hover .service-icon {
+        transform: scale(1.1) rotateY(10deg);
+    }
+
+    .specialty-card {
+        padding: 20px;
+        border-radius: 12px;
+        text-align: center;
+        background: white;
+        transition: all 0.3s ease;
+        cursor: pointer;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    }
+
+    a .specialty-card:hover {
+        transform: translateY(-6px);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+        background: #f8f9fa;
+    }
+
+    .specialty-card .fs-1 {
+        transition: all 0.3s ease;
+    }
+
+    a .specialty-card:hover .fs-1 {
+        transform: scale(1.15);
+    }
+
+    .search-box {
+        position: relative;
+    }
+
+    .search-box .suggestions-dropdown {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        background: white;
+        border: 1px solid #e0e0e0;
+        border-top: none;
+        border-radius: 0 0 10px 10px;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+        z-index: 900;
+        max-height: 400px;
+        overflow-y: auto;
+        margin-top: -1px;
+    }
+
+    .home-search-btn {
+        position: relative;
+        z-index: 1001;
+        cursor: pointer !important;
+        font-weight: 600;
+    }
+
+    .home-search-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(10, 116, 218, 0.3);
+    }
+
+    .search-box .suggestions-list {
+        padding: 0;
+        margin: 0;
+    }
+
+    .search-box .suggestions-section {
+        border-bottom: 1px solid #f0f0f0;
+    }
+
+    .search-box .suggestions-section:last-child {
+        border-bottom: none;
+    }
+
+    .search-box .suggestions-section-title {
+        padding: 8px 12px;
+        font-size: 0.75rem;
+        font-weight: 700;
+        color: #999;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        background-color: #fafafa;
+    }
+
+    .search-box .suggestion-item {
+        display: flex;
+        align-items: flex-start;
+        padding: 12px;
+        color: #333;
+        text-decoration: none;
+        transition: all 0.2s ease;
+        border-left: 3px solid transparent;
+    }
+
+    .search-box .suggestion-item:hover {
+        background-color: #f5f7fa;
+        border-left-color: #0A74DA;
+        color: #0A74DA;
+    }
+
+    .search-box .suggestion-item i {
+        margin-top: 2px;
+        font-size: 1.1rem;
+        min-width: 24px;
+    }
+
+    .search-box .suggestion-content {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .search-box .suggestion-title {
+        font-weight: 500;
+        color: inherit;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .search-box .suggestion-subtitle {
+        font-size: 0.85rem;
+        color: #999;
+        margin-top: 2px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .search-box .suggestion-no-results {
+        padding: 24px;
+        text-align: center;
+        color: #999;
+    }
+
+    .search-box .suggestion-no-results i {
+        font-size: 2rem;
+        display: block;
+        margin-bottom: 8px;
+        opacity: 0.5;
+    }
+
+    .search-box .suggestions-dropdown::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    .search-box .suggestions-dropdown::-webkit-scrollbar-track {
+        background: #f1f1f1;
+    }
+
+    .search-box .suggestions-dropdown::-webkit-scrollbar-thumb {
+        background: #c1c1c1;
+        border-radius: 3px;
+    }
+
+    .search-box .suggestions-dropdown::-webkit-scrollbar-thumb:hover {
+        background: #a1a1a1;
+    }
+</style>
+
+<script>
+    // Setup auto-suggest for home page search
+    function setupHomeAutoSuggest() {
+        const searchInput = document.getElementById('homeSearchInput');
+        const suggestionsDropdown = document.getElementById('homeSuggestionsDropdown');
+        if (!searchInput || !suggestionsDropdown) return;
+        
+        const suggestionsList = suggestionsDropdown.querySelector('.suggestions-list');
+        let suggestionsTimeout;
+
+        searchInput.addEventListener('input', function() {
+            const query = this.value.trim();
+            
+            clearTimeout(suggestionsTimeout);
+            
+            if (query.length < 2) {
+                suggestionsDropdown.style.display = 'none';
+                return;
+            }
+            
+            suggestionsTimeout = setTimeout(() => {
+                fetchSuggestions(query);
+            }, 300);
+        });
+
+        async function fetchSuggestions(query) {
+            try {
+                const response = await fetch(`/doctors/api/search-suggestions/?q=${encodeURIComponent(query)}`);
+                const data = await response.json();
+                
+                if (data.suggestions && data.suggestions.length > 0) {
+                    displaySuggestions(data.suggestions);
+                } else {
+                    displayNoResults();
+                }
+            } catch (error) {
+                console.error('Error fetching suggestions:', error);
+            }
+        }
+
+        function displaySuggestions(suggestions) {
+            suggestionsList.innerHTML = '';
+            
+            const grouped = {
+                doctor: [],
+                specialty: [],
+                hospital: []
+            };
+            
+            suggestions.forEach(suggestion => {
+                if (grouped[suggestion.type]) {
+                    grouped[suggestion.type].push(suggestion);
+                }
+            });
+            
+            if (grouped.doctor.length > 0) {
+                const doctorSection = createSection('Doctors', grouped.doctor);
+                suggestionsList.appendChild(doctorSection);
+            }
+            
+            if (grouped.specialty.length > 0) {
+                const specialtySection = createSection('Specialties', grouped.specialty);
+                suggestionsList.appendChild(specialtySection);
+            }
+            
+            if (grouped.hospital.length > 0) {
+                const hospitalSection = createSection('Hospitals', grouped.hospital);
+                suggestionsList.appendChild(hospitalSection);
+            }
+            
+            suggestionsDropdown.style.display = 'block';
+        }
+
+        function createSection(title, items) {
+            const section = document.createElement('div');
+            section.className = 'suggestions-section';
+            
+            const heading = document.createElement('div');
+            heading.className = 'suggestions-section-title';
+            heading.textContent = title;
+            section.appendChild(heading);
+            
+            items.forEach(item => {
+                const itemEl = document.createElement('a');
+                itemEl.href = item.url;
+                itemEl.className = 'suggestion-item';
+                
+                let icon = 'bi-person';
+                if (item.type === 'specialty') icon = 'bi-stethoscope';
+                if (item.type === 'hospital') icon = 'bi-hospital';
+                
+                itemEl.innerHTML = `
+                    <i class="bi ${icon} me-2"></i>
+                    <div class="suggestion-content">
+                        <div class="suggestion-title">${escapeHtml(item.name)}</div>
+                        ${item.subtitle ? `<div class="suggestion-subtitle">${escapeHtml(item.subtitle)}</div>` : ''}
+                    </div>
+                `;
+                
+                section.appendChild(itemEl);
+            });
+            
+            return section;
+        }
+
+        function displayNoResults() {
+            suggestionsList.innerHTML = `
+                <div class="suggestion-no-results">
+                    <i class="bi bi-search"></i>
+                    <p>No results found</p>
+                </div>
+            `;
+            suggestionsDropdown.style.display = 'block';
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // Hide dropdown when clicking outside
+        document.addEventListener('click', function(event) {
+            if (!event.target.closest('.input-group') && !event.target.closest('#homeSuggestionsDropdown')) {
+                suggestionsDropdown.style.display = 'none';
+            }
+        });
+
+        // Show dropdown again when clicking on input
+        searchInput.addEventListener('focus', function() {
+            if (this.value.trim().length >= 2) {
+                suggestionsDropdown.style.display = 'block';
+            }
+        });
+    }
+
+    // Initialize when DOM is ready
+    document.addEventListener('DOMContentLoaded', function() {
+        setupHomeAutoSuggest();
+        
+        // Form submission handler
+        const homeSearchForm = document.getElementById('homeSearchForm');
+        if (homeSearchForm) {
+            homeSearchForm.addEventListener('submit', function(e) {
+                const dropdown = document.getElementById('homeSuggestionsDropdown');
+                if (dropdown) {
+                    dropdown.style.display = 'none';
+                }
+                return true;
+            });
+        }
+
+        // Submit button handler
+        const searchBtn = document.querySelector('.home-search-btn');
+        if (searchBtn && homeSearchForm) {
+            searchBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                const dropdown = document.getElementById('homeSuggestionsDropdown');
+                if (dropdown) {
+                    dropdown.style.display = 'none';
+                }
+                homeSearchForm.submit();
+            });
+        }
+
+        // Allow Enter key to submit the form
+        document.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                const input = document.getElementById('homeSearchInput');
+                if (input && document.activeElement === input) {
+                    e.preventDefault();
+                    homeSearchForm.submit();
+                }
+            }
+        });
+    });
+</script>
+
+<!-- Diagnostic Hotline Modal -->
+<div class="modal fade" id="diagnosticModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title fw-bold">Diagnostic Hotline</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <div class="hotline-card p-3 rounded bg-light">
+                            <div class="d-flex align-items-center gap-2 mb-2">
+                                <i class="bi bi-telephone text-primary fs-5"></i>
+                                <span class="text-muted small">Chathkil</span>
+                            </div>
+                            <a href="tel:01307010586" class="text-dark fw-bold text-decoration-none">01307010586</a>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="hotline-card p-3 rounded bg-light">
+                            <div class="d-flex align-items-center gap-2 mb-2">
+                                <i class="bi bi-telephone text-primary fs-5"></i>
+                                <span class="text-muted small">Subarnachar</span>
+                            </div>
+                            <a href="tel:01307010586" class="text-dark fw-bold text-decoration-none">01307010586</a>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="hotline-card p-3 rounded bg-light">
+                            <div class="d-flex align-items-center gap-2 mb-2">
+                                <i class="bi bi-telephone text-primary fs-5"></i>
+                                <span class="text-muted small">Dhaka</span>
+                            </div>
+                            <a href="tel:01713-123456" class="text-dark fw-bold text-decoration-none">01713-123456</a>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="hotline-card p-3 rounded bg-light">
+                            <div class="d-flex align-items-center gap-2 mb-2">
+                                <i class="bi bi-telephone text-primary fs-5"></i>
+                                <span class="text-muted small">Chittagong</span>
+                            </div>
+                            <a href="tel:01713-234567" class="text-dark fw-bold text-decoration-none">01713-234567</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Ambulance Hotline Modal -->
+<div class="modal fade" id="ambulanceModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title fw-bold">Ambulance Service</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <div class="hotline-card p-3 rounded bg-light">
+                            <div class="d-flex align-items-center gap-2 mb-2">
+                                <i class="bi bi-telephone text-danger fs-5"></i>
+                                <span class="text-muted small">Emergency</span>
+                            </div>
+                            <a href="tel:999" class="text-dark fw-bold text-decoration-none">999</a>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="hotline-card p-3 rounded bg-light">
+                            <div class="d-flex align-items-center gap-2 mb-2">
+                                <i class="bi bi-telephone text-danger fs-5"></i>
+                                <span class="text-muted small">Dhaka</span>
+                            </div>
+                            <a href="tel:01713-123456" class="text-dark fw-bold text-decoration-none">01713-123456</a>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="hotline-card p-3 rounded bg-light">
+                            <div class="d-flex align-items-center gap-2 mb-2">
+                                <i class="bi bi-telephone text-danger fs-5"></i>
+                                <span class="text-muted small">Chittagong</span>
+                            </div>
+                            <a href="tel:01713-234567" class="text-dark fw-bold text-decoration-none">01713-234567</a>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="hotline-card p-3 rounded bg-light">
+                            <div class="d-flex align-items-center gap-2 mb-2">
+                                <i class="bi bi-telephone text-danger fs-5"></i>
+                                <span class="text-muted small">Chathkil</span>
+                            </div>
+                            <a href="tel:01307010586" class="text-dark fw-bold text-decoration-none">01307010586</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ICU/NICU Bed Availability Modal -->
+<div class="modal fade" id="icuModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title fw-bold">ICU / NICU Bed Availability</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <div class="hotline-card p-3 rounded bg-light">
+                            <div class="d-flex align-items-center gap-2 mb-2">
+                                <i class="bi bi-telephone text-info fs-5"></i>
+                                <span class="text-muted small">Emergency</span>
+                            </div>
+                            <a href="tel:999" class="text-dark fw-bold text-decoration-none">999</a>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="hotline-card p-3 rounded bg-light">
+                            <div class="d-flex align-items-center gap-2 mb-2">
+                                <i class="bi bi-telephone text-info fs-5"></i>
+                                <span class="text-muted small">Dhaka</span>
+                            </div>
+                            <a href="tel:01713-123456" class="text-dark fw-bold text-decoration-none">01713-123456</a>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="hotline-card p-3 rounded bg-light">
+                            <div class="d-flex align-items-center gap-2 mb-2">
+                                <i class="bi bi-telephone text-info fs-5"></i>
+                                <span class="text-muted small">Chittagong</span>
+                            </div>
+                            <a href="tel:01713-234567" class="text-dark fw-bold text-decoration-none">01713-234567</a>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="hotline-card p-3 rounded bg-light">
+                            <div class="d-flex align-items-center gap-2 mb-2">
+                                <i class="bi bi-telephone text-info fs-5"></i>
+                                <span class="text-muted small">Chathkil</span>
+                            </div>
+                            <a href="tel:01307010586" class="text-dark fw-bold text-decoration-none">01307010586</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

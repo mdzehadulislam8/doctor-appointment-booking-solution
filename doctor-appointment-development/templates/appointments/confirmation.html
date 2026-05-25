@@ -1,0 +1,86 @@
+{% extends 'base.html' %}
+
+{% block title %}Appointment Confirmed - DrSeba.com{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <!-- Back Button -->
+    <a href="/" class="btn btn-link text-primary mb-3">
+        <i class="bi bi-chevron-left me-2"></i>Back
+    </a>
+
+    <div class="row">
+        <div class="col-lg-8 offset-lg-2">
+            <!-- Step Indicator - All Completed -->
+            <div class="d-flex justify-content-between align-items-center mb-5">
+                <div class="text-center flex-grow-1">
+                    <div class="badge rounded-circle bg-success" style="width: 40px; height: 40px; line-height: 40px; font-size: 1.1rem;">✓</div>
+                    <small class="d-block mt-2">Select Appointments</small>
+                </div>
+                <div class="flex-grow-1 border-top border-2 border-success"></div>
+                
+                <div class="text-center flex-grow-1">
+                    <div class="badge rounded-circle bg-success" style="width: 40px; height: 40px; line-height: 40px; font-size: 1.1rem;">✓</div>
+                    <small class="d-block mt-2">Patient Info</small>
+                </div>
+                <div class="flex-grow-1 border-top border-2 border-success"></div>
+                
+                <div class="text-center flex-grow-1">
+                    <div class="badge rounded-circle bg-success" style="width: 40px; height: 40px; line-height: 40px; font-size: 1.1rem;">✓</div>
+                    <small class="d-block mt-2">Payment</small>
+                </div>
+                <div class="flex-grow-1 border-top border-2 border-success"></div>
+                
+                <div class="text-center flex-grow-1">
+                    <div class="badge rounded-circle bg-success" style="width: 40px; height: 40px; line-height: 40px; font-size: 1.1rem;">✓</div>
+                    <small class="d-block mt-2 fw-bold">Confirmation</small>
+                </div>
+            </div>
+
+            <!-- Confirmation Message -->
+            <div class="text-center mb-5">
+                <div style="font-size: 4rem; color: #27ae60; margin-bottom: 1rem;">✓</div>
+                <h2 class="fw-bold mb-3">Booking Confirmed!</h2>
+                <p class="text-muted" style="font-size: 1.1rem;">Your appointments have been successfully booked. You will receive confirmations via SMS and email.</p>
+            </div>
+
+            <!-- Confirmation Details -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body p-4">
+                    <div class="row mb-4">
+                        <div class="col-6">
+                            <small class="text-muted d-block mb-1">Booking ID</small>
+                            <h6 class="fw-bold">BK21552</h6>
+                        </div>
+                        <div class="col-6 text-end">
+                            <small class="text-muted d-block mb-1">Doctor</small>
+                            <h6 class="fw-bold">Dr {{ appointment.doctor.user.get_full_name }}</h6>
+                        </div>
+                    </div>
+
+                    <hr>
+
+                    <div class="row mb-4">
+                        <div class="col-6">
+                            <small class="text-muted d-block mb-1">Total Appointments</small>
+                            <h6 class="fw-bold">1</h6>
+                        </div>
+                        <div class="col-6 text-end">
+                            <small class="text-muted d-block mb-1">Amount Paid</small>
+                            <h6 class="fw-bold">৳50</h6>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Actions -->
+            <div class="d-grid gap-2">
+                <a href="/dashboard/" class="btn btn-primary btn-lg">
+                    <i class="bi bi-speedometer me-2"></i>View Dashboard
+                </a>
+                <a href="/" class="btn btn-outline-secondary btn-lg">Go Home</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
