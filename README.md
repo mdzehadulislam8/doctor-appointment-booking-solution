@@ -1,6 +1,6 @@
 # Doctor Appointment Booking Solution 🏥
 
-![Banner](https://via.placeholder.com/1200x300.png?text=Doctor+Appointment+Booking+Platform)
+<!-- ![Banner](https://via.placeholder.com/1200x300.png?text=Doctor+Appointment+Booking+Platform) -->
 
 A comprehensive, end-to-end healthcare management platform designed to bridge the gap between patients and healthcare providers. This solution provides a seamless web interface for booking appointments, processing payments, managing hospital resources, and leverages Machine Learning & Data Analytics to enhance decision-making.
 
