@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dr. Seba Commission Revenue Forecasting</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/style_new.css' %}">
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="header-content">
+            <div>
+                <h1>💳 Commission Revenue Forecasting</h1>
+                <p>AI-Powered Revenue Prediction System</p>
+            </div>
+            <div class="header-badges">
+                <div class="badge">ML Powered</div>
+                <div class="badge">Real-time</div>
+                <div class="badge">Accurate</div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="container">
+        <!-- Messages -->
+        {% if messages %}
+            <div class="messages">
+                {% for message in messages %}
+                    {% if message.tags == 'error' %}
+                        <div class="alert alert-error">
+                            ⚠️ {{ message }}
+                        </div>
+                    {% elif message.tags == 'success' %}
+                        <div class="alert alert-success">
+                            ✅ {{ message }}
+                        </div>
+                    {% else %}
+                        <div class="alert alert-info">
+                            ℹ️ {{ message }}
+                        </div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <div class="content">
+            <!-- Sidebar Form -->
+            <aside class="form-section">
+                <h2>Search Criteria</h2>
+                <form method="POST" class="forecast-form">
+                    {% csrf_token %}
+
+                    <!-- Basic Information -->
+                    <fieldset>
+                        <legend>Professional Info</legend>
+                        
+                        <div class="form-group">
+                            <label for="total_bookings">📊 Total Bookings</label>
+                            <input type="number" id="total_bookings" name="total_bookings" 
+                                   value="{% if form_data %}{{ form_data.total_bookings }}{% else %}180{% endif %}"
+                                   min="0" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="avg_fee">💰 Average Fee (৳)</label>
+                            <input type="number" id="avg_fee" name="avg_fee" 
+                                   value="{% if form_data %}{{ form_data.avg_fee }}{% else %}700{% endif %}"
+                                   min="0" step="0.01" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="commission_rate">📈 Commission Rate (%)</label>
+                            <input type="number" id="commission_rate" name="commission_rate" 
+                                   value="{% if form_data %}{{ commission_rate_percent }}{% else %}12{% endif %}"
+                                   min="0" max="100" step="0.1" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="service_charge">🏥 Service Charge (৳)</label>
+                            <input type="number" id="service_charge" name="service_charge" 
+                                   value="{% if form_data %}{{ form_data.service_charge }}{% else %}60{% endif %}"
+                                   min="0" step="0.01" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="experience_years">📅 Experience (Years)</label>
+                            <input type="number" id="experience_years" name="experience_years" 
+                                   value="{% if form_data %}{{ form_data.experience_years }}{% else %}12{% endif %}"
+                                   min="0" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="rating_avg">⭐ Average Rating</label>
+                            <input type="number" id="rating_avg" name="rating_avg" 
+                                   value="{% if form_data %}{{ form_data.rating_avg }}{% else %}4.7{% endif %}"
+                                   min="0" max="5" step="0.1" required>
+                        </div>
+                    </fieldset>
+
+                    <!-- Location & Specialization -->
+                    <fieldset>
+                        <legend>Location & Specialty</legend>
+                        
+                        <div class="form-group">
+                            <label for="district">📍 District</label>
+                            <select id="district" name="district" required>
+                                {% for dist in districts %}
+                                    <option value="{{ dist }}" {% if form_data.district == dist %}selected{% endif %}>
+                                        {{ dist }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="specialization_group">🩺 Specialization</label>
+                            <select id="specialization_group" name="specialization_group" required>
+                                {% for spec in specializations %}
+                                    <option value="{{ spec }}" {% if form_data.specialization_group == spec %}selected{% endif %}>
+                                        {{ spec }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="hospital_type">🏢 Hospital Type</label>
+                            <select id="hospital_type" name="hospital_type" required>
+                                {% for htype in hospital_types %}
+                                    <option value="{{ htype }}" {% if form_data.hospital_type == htype %}selected{% endif %}>
+                                        {{ htype }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </fieldset>
+
+                    <!-- Historical Data -->
+                    <fieldset>
+                        <legend>Historical Data</legend>
+                        
+                        <div class="form-group">
+                            <label for="lag_1">📆 Prev Day Revenue</label>
+                            <input type="number" id="lag_1" name="lag_1" 
+                                   value="{% if form_data %}{{ form_data.lag_1 }}{% else %}9500{% endif %}"
+                                   min="0" step="0.01" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="lag_7">📊 7-Day Lagged Rev</label>
+                            <input type="number" id="lag_7" name="lag_7" 
+                                   value="{% if form_data %}{{ form_data.lag_7 }}{% else %}8800{% endif %}"
+                                   min="0" step="0.01" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="rolling_mean_7">📈 7-Day Avg Rev</label>
+                            <input type="number" id="rolling_mean_7" name="rolling_mean_7" 
+                                   value="{% if form_data %}{{ form_data.rolling_mean_7 }}{% else %}9000{% endif %}"
+                                   min="0" step="0.01" required>
+                        </div>
+                    </fieldset>
+
+                    <!-- Forecast Options -->
+                    <fieldset>
+                        <legend>Forecast Options</legend>
+                        
+                        <div class="form-group">
+                            <label for="forecast_type">🎯 Forecast Type</label>
+                            <select id="forecast_type" name="forecast_type" required>
+                                <option value="predict">Single Day Prediction</option>
+                                <option value="forecast" selected>Multi-Day Forecast</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group" id="days_field">
+                            <label for="days">📅 Number of Days</label>
+                            <input type="number" id="days" name="days" 
+                                   value="{% if days %}{{ days }}{% else %}30{% endif %}"
+                                   min="1" max="365" required>
+                        </div>
+                    </fieldset>
+
+                    <!-- Submit Button -->
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary">
+                            🔍 Search
+                        </button>
+                        <button type="reset" class="btn btn-secondary">
+                            🔄 Clear
+                        </button>
+                    </div>
+                </form>
+            </aside>
+
+            <!-- Results Section -->
+            <section class="results-section">
+                {% if prediction %}
+                    <!-- Single Prediction Result -->
+                    <div class="result-card">
+                        <h2>📅 Single Day Prediction</h2>
+                        <div class="prediction-box">
+                            <div class="prediction-value">
+                                ৳ {{ prediction|floatformat:0 }}
+                            </div>
+                            <p class="prediction-label">Predicted Next Day Revenue</p>
+                        </div>
+                    </div>
+
+                {% elif forecast %}
+                    <!-- Multi-Day Forecast Results -->
+                    <div class="result-card">
+                        <h2>📈 {{ forecast.total_days }}-Day Forecast Results</h2>
+
+                        <!-- Daily Forecast -->
+                        <div class="forecast-section">
+                            <h3>📅 Daily Forecast (First 7 Days)</h3>
+                            <div class="daily-forecast">
+                                {% for value in forecast.daily_forecast %}
+                                    <div class="daily-item">
+                                        <span class="day">Day {{ forloop.counter }}</span>
+                                        <span class="amount">৳ {{ value|floatformat:0 }}</span>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+
+                        <!-- Weekly Summary -->
+                        <div class="forecast-section">
+                            <h3>📊 Weekly Summary</h3>
+                            <div class="summary-grid">
+                                <div class="summary-item">
+                                    <span class="label">Week 1 Total</span>
+                                    <span class="value">৳ {{ forecast.weekly_total|floatformat:0 }}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Monthly/Total Summary -->
+                        <div class="forecast-section">
+                            <h3>🎯 Total Forecast Summary</h3>
+                            <div class="summary-grid">
+                                <div class="summary-item">
+                                    <span class="label">Total ({{ forecast.total_days }} days)</span>
+                                    <span class="value">৳ {{ forecast.monthly_total|floatformat:0 }}</span>
+                                </div>
+                                <div class="summary-item">
+                                    <span class="label">Daily Average</span>
+                                    <span class="value">৳ {{ daily_average|floatformat:0 }}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Statistics -->
+                        <div class="forecast-section">
+                            <h3>📉 Prediction Statistics</h3>
+                            <div class="stats-grid">
+                                <div class="stat-item">
+                                    <span class="stat-label">Minimum</span>
+                                    <span class="stat-value">৳ {{ forecast.daily_statistics.min|floatformat:0 }}</span>
+                                </div>
+                                <div class="stat-item">
+                                    <span class="stat-label">Maximum</span>
+                                    <span class="stat-value">৳ {{ forecast.daily_statistics.max|floatformat:0 }}</span>
+                                </div>
+                                <div class="stat-item">
+                                    <span class="stat-label">Average</span>
+                                    <span class="stat-value">৳ {{ forecast.daily_statistics.mean|floatformat:0 }}</span>
+                                </div>
+                                <div class="stat-item">
+                                    <span class="stat-label">Std Dev</span>
+                                    <span class="stat-value">৳ {{ forecast.daily_statistics.std_dev|floatformat:0 }}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Weekly Breakdown -->
+                        {% if forecast.weekly_breakdown %}
+                            <div class="forecast-section">
+                                <h3>📋 Weekly Breakdown</h3>
+                                <div class="weekly-breakdown">
+                                    {% for week_total in forecast.weekly_breakdown %}
+                                        <div class="week-item">
+                                            <span class="week">Week {{ forloop.counter }}</span>
+                                            <span class="amount">৳ {{ week_total|floatformat:0 }}</span>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        {% endif %}
+                    </div>
+
+                {% else %}
+                    <!-- Welcome/No Results Message -->
+                    <div class="no-results">
+                        <div style="font-size: 60px; margin-bottom: 20px;">👋</div>
+                        <p>Fill in your search criteria and click "Search" to get started</p>
+                        <p style="font-size: 14px; margin-top: 12px; color: #9ca3af;">AI-powered predictions • Real-time analytics • Accurate forecasting</p>
+                    </div>
+                {% endif %}
+            </section>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <p>&copy; 2026 Dr. Seba Commission Revenue Forecasting System | Powered by ML</p>
+    </footer>
+</body>
+</html>

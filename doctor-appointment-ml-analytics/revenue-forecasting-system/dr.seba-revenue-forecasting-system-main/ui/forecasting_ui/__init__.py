@@ -1,0 +1,3 @@
+"""
+Forecasting UI package initialization
+"""

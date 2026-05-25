@@ -1,0 +1,3 @@
+"""
+Forecaster app initialization
+"""
