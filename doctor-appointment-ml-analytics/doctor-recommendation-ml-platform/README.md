@@ -9,7 +9,7 @@ Developed by the Data Science Team during an internship program for the Dr.Seba 
 [![CatBoost](https://img.shields.io/badge/CatBoost-99.63%25%20R²-orange.svg)](https://catboost.ai/)
 [![Status](https://img.shields.io/badge/Status-Production%20Ready-brightgreen.svg)](#-quick-start-guide)
 
-## Table of Contents
+## Table of Content
 
 - [The Problem](#-the-problem)
 - [Key Capabilities](#-key-capabilities)
