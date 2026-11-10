@@ -4,7 +4,7 @@
 
 A comprehensive, end-to-end healthcare management platform designed to bridge the gap between patients and healthcare providers. This solution provides a seamless web interface for booking appointments, processing payments, managing hospital resources, and leverages Machine Learning & Data Analytics to enhance decision-making.
 
-## 🚀 Key Features
+## 🚀 Key Features 
 
 ### 1. Core Web Application (`doctor-appointment-development`)
 *   **User Roles & Auth**: Separate portals for Patients, Doctors, and Admins.
